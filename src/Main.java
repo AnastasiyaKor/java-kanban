@@ -20,27 +20,27 @@ public class Main {
         SubTask subTask3 = new SubTask("убрать лишние растения", " ", epic2.getId());
         manager.createSubTasks(subTask3);
         //печатаем списки задач
-        manager.printTasks();
-        manager.printEpics();
-        manager.printSubTasks();
+        manager.getAllTasks();
+        manager.getAllEpics();
+        manager.getAllSubTasks();
         //меняем статус у задач
-        task1.setStatus(String.valueOf(Task.Status.DONE));
+        task1.setStatus(String.valueOf(Status.DONE));
         manager.refreshTasks(task1);
-        manager.printTasks();
+        manager.getAllTasks();
 
-        task2.setStatus(String.valueOf(Task.Status.IN_PROGRESS));
+        task2.setStatus(String.valueOf(Status.IN_PROGRESS));
         manager.refreshTasks(task2);
-        manager.printTasks();
+        manager.getAllTasks();
 
-        subTask1.setStatus(String.valueOf(Task.Status.IN_PROGRESS));
+        subTask1.setStatus(String.valueOf(Status.IN_PROGRESS));
         manager.refreshSubTasks(subTask1);
-        manager.printSubTasks();
+        manager.getAllSubTasks();
 
-        epic1.setStatus(String.valueOf(Task.Status.DONE));
+        epic1.setStatus(String.valueOf(Status.DONE));
         manager.refreshEpics(epic1);
-        manager.printEpics();
+        manager.getAllEpics();
         //удаляем задачу
-        manager.removeTasks(1);
-        manager.printTasks();
+        manager.removeTaskById(1);
+        manager.getAllTasks();
     }
 }

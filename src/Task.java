@@ -3,19 +3,17 @@ import java.util.Objects;
 public class Task {
     private String name;
     private String description;
-    private String status;
+    private Status status;
     private int id;
 
     public Task(String name, String description, String status) {
         this.name = name;
         this.description = description;
-        this.status = status;
     }
 
     public Task(String name, String description) {
         this.name = name;
         this.description = description;
-        this.status = String.valueOf(Status.NEW);
     }
 
     public String getName() {
@@ -34,12 +32,12 @@ public class Task {
         this.description = description;
     }
 
-    public String getStatus() {
+    public Status getStatus() {
         return status;
     }
 
     public void setStatus(String status) {
-        this.status = status;
+        this.status = Status.valueOf(status);
     }
 
     public int getId() {
@@ -72,11 +70,4 @@ public class Task {
                 ", status='" + status + '\'' +
                 '}';
     }
-
-    public enum Status {
-        NEW,
-        IN_PROGRESS,
-        DONE
-    }
-
 }
