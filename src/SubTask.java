@@ -3,12 +3,12 @@ import java.util.Objects;
 public class SubTask extends Task {
     private int epicId;
 
-    public SubTask(String name, String description, String status) {
+    public SubTask(String name, String description, Status status, int epicId) {
         super(name, description, status);
     }
 
     public SubTask(String name, String description, int epicId) {
-        super(name, description);
+        super(name, description, Status.NEW);
         this.epicId = epicId;
     }
 

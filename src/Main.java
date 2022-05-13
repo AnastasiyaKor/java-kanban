@@ -28,17 +28,14 @@ public class Main {
         manager.refreshTasks(task1);
         manager.getAllTasks();
 
-        task2.setStatus(String.valueOf(Status.IN_PROGRESS));
-        manager.refreshTasks(task2);
-        manager.getAllTasks();
-
         subTask1.setStatus(String.valueOf(Status.IN_PROGRESS));
         manager.refreshSubTasks(subTask1);
         manager.getAllSubTasks();
-
-        epic1.setStatus(String.valueOf(Status.DONE));
-        manager.refreshEpics(epic1);
         manager.getAllEpics();
+
+        task2.setStatus(String.valueOf(Status.IN_PROGRESS));
+        manager.refreshTasks(task2);
+        manager.getAllTasks();
         //удаляем задачу
         manager.removeTaskById(1);
         manager.getAllTasks();
