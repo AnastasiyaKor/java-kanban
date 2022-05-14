@@ -24,16 +24,16 @@ public class Main {
         manager.getAllEpics();
         manager.getAllSubTasks();
         //меняем статус у задач
-        task1.setStatus(String.valueOf(Status.DONE));
+        task1.setStatus(Status.DONE);
         manager.refreshTasks(task1);
         manager.getAllTasks();
 
-        subTask1.setStatus(String.valueOf(Status.IN_PROGRESS));
+        subTask1.setStatus(Status.IN_PROGRESS);
         manager.refreshSubTasks(subTask1);
         manager.getAllSubTasks();
         manager.getAllEpics();
 
-        task2.setStatus(String.valueOf(Status.IN_PROGRESS));
+        task2.setStatus(Status.IN_PROGRESS);
         manager.refreshTasks(task2);
         manager.getAllTasks();
         //удаляем задачу

@@ -38,8 +38,8 @@ public class Task {
         return status;
     }
 
-    public void setStatus(String status) {
-        this.status = Status.valueOf(status);
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     public int getId() {
@@ -69,7 +69,8 @@ public class Task {
         return "Task{" +
                 "name='" + name + '\'' +
                 ", description='" + description + '\'' +
-                ", status='" + status + '\'' +
+                ", status=" + status +
+                ", id=" + id +
                 '}';
     }
 }

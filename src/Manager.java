@@ -29,13 +29,12 @@ public class Manager {
     public void createSubTasks(SubTask subTask) {
         subTask.setId(id);
         id++;
-        if (epics.get(id) != null) {
+        if (epics.containsKey(subTask.getEpicId())) {
             subTasks.put(subTask.getId(), subTask);
             getSubtasksByEpicId(subTask.getEpicId()).add(subTask.getId());
             refreshStatusEpic(subTask.getEpicId());
         }
     }
-
 
     //    получение списка задач, эпиков, подзадач
     public HashMap<Integer, Task> getAllTasks() {
@@ -101,28 +100,24 @@ public class Manager {
     }
 
     //    обновление статуса эпика
-    public void refreshStatusEpic(int id) {
-        Epic epic = getEpicById(id);
+    public void refreshStatusEpic(int epicId) {
+        Epic epic = getEpicById(epicId);
         int newStatus = 0;
         int done = 0;
-        if (getSubtasksByEpicId(id) != null) {
-            for (SubTask i : subTasks.values()) {
-                if (i.getEpicId() == id) {
-                    if (i.getStatus().equals(Status.NEW)) {
-                        newStatus++;
-                    } else if (i.getStatus().equals(Status.DONE)) {
-                        done++;
-                    } else {
-                        epic.setStatus(String.valueOf(Status.IN_PROGRESS));
-                    }
+        if (getSubtasksByEpicId(epicId) != null) {
+            for (Integer i : getSubtasksByEpicId(epicId)) {
+                if (getSubTaskById(i).getStatus().equals(Status.NEW)) {
+                    newStatus++;
+                } else if (getSubTaskById(i).getStatus().equals(Status.DONE)) {
+                    done++;
                 }
+                epic.setStatus(Status.IN_PROGRESS);
+                break;
             }
-            if (getSubtasksByEpicId(id).size() == newStatus) {
-                epic.setStatus(String.valueOf(Status.NEW));
-            } else if (getSubtasksByEpicId(id).size() == done) {
-                epic.setStatus(String.valueOf(Status.DONE));
-            } else {
-                epic.setStatus(String.valueOf(Status.IN_PROGRESS));
+            if (getSubtasksByEpicId(epicId).size() == newStatus) {
+                epic.setStatus(Status.NEW);
+            } else if (getSubtasksByEpicId(epicId).size() == done) {
+                epic.setStatus(Status.DONE);
             }
         }
     }
@@ -140,7 +135,7 @@ public class Manager {
     public void clearSubTasks() {
         subTasks.clear();
         for (Epic epic : epics.values()) {
-            epic.setStatus(String.valueOf(Status.NEW));
+            epic.setStatus(Status.NEW);
             epic.getSubTasksId().clear();
         }
     }
