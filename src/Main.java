@@ -1,7 +1,8 @@
 public class Main {
 
     public static void main(String[] args) {
-        Manager manager = new Manager();
+        TaskManager manager = Managers.getDefault();
+        HistoryManager historyManager = Managers.getDefaultHistory();
         //создаем 2 задачи
         Task task1 = new Task("Полить цветы", "полить все цветы на кухне");
         manager.createTasks(task1);
@@ -39,5 +40,11 @@ public class Main {
         //удаляем задачу
         manager.removeTaskById(1);
         manager.getAllTasks();
+        //получаем список задач по идентификатору
+        manager.getEpicById(1);
+        manager.getSubTaskById(2);
+        manager.getTaskById(1);
+        //смотрим историю
+        System.out.println(historyManager.getHistory());
     }
 }
