@@ -39,7 +39,7 @@ class InMemoryHistoryManager implements HistoryManager {
         InMemoryHistoryManager that = (InMemoryHistoryManager) o;
         return MAXI_ITEMS_IN_THE_LIST == that.MAXI_ITEMS_IN_THE_LIST && viewedTasks.equals(that.viewedTasks);
     }
-
+    
     @Override
     public int hashCode() {
         return Objects.hash(MAXI_ITEMS_IN_THE_LIST, viewedTasks);
