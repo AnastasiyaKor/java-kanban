@@ -15,7 +15,6 @@ public class InMemoryTaskManager implements TaskManager {
         this.subTasks = new HashMap<>();
     }
 
-
     //    создание задач, эпиков, подзадач
     @Override
     public void createTasks(Task task) {
@@ -70,19 +69,19 @@ public class InMemoryTaskManager implements TaskManager {
     //    получение задач, эпиков, подзадач по идентификатору
     @Override
     public Task getTaskById(int id) {
-        historyManager.add(tasks.get(id));//добавляем вызов задачи в список
+        historyManager.add(tasks.get(id));
         return tasks.get(id);
     }
 
     @Override
     public Epic getEpicById(int id) {
-        historyManager.add(epics.get(id));//добавляем вызов эпика в список
+        historyManager.add(epics.get(id));
         return epics.get(id);
     }
 
     @Override
     public SubTask getSubTaskById(int id) {
-        historyManager.add(subTasks.get(id));//добавляем вызов подзадачи в список
+        historyManager.add(subTasks.get(id));
         return subTasks.get(id);
     }
 
@@ -196,7 +195,9 @@ public class InMemoryTaskManager implements TaskManager {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         InMemoryTaskManager that = (InMemoryTaskManager) o;
-        return id == that.id && Objects.equals(historyManager, that.historyManager) && Objects.equals(tasks, that.tasks) && Objects.equals(epics, that.epics) && Objects.equals(subTasks, that.subTasks);
+        return id == that.id && Objects.equals(historyManager, that.historyManager)
+                && Objects.equals(tasks, that.tasks)
+                && Objects.equals(epics, that.epics) && Objects.equals(subTasks, that.subTasks);
     }
 
     @Override
