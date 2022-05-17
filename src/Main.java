@@ -3,6 +3,7 @@ public class Main {
     public static void main(String[] args) {
         TaskManager manager = Managers.getDefault();
         HistoryManager historyManager = Managers.getDefaultHistory();
+
         //создаем 2 задачи
         Task task1 = new Task("Полить цветы", "полить все цветы на кухне");
         manager.createTasks(task1);
