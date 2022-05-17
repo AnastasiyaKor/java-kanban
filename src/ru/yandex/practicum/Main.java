@@ -1,8 +1,12 @@
+package ru.yandex.practicum;
+
+import ru.yandex.practicum.model.*;
+import ru.yandex.practicum.service.*;
+
 public class Main {
 
     public static void main(String[] args) {
         TaskManager manager = Managers.getDefault();
-        HistoryManager historyManager = Managers.getDefaultHistory();
 
         //создаем 2 задачи
         Task task1 = new Task("Полить цветы", "полить все цветы на кухне");
@@ -46,6 +50,6 @@ public class Main {
         manager.getSubTaskById(2);
         manager.getTaskById(1);
         //смотрим историю
-        System.out.println(historyManager.getHistory());
+        System.out.println(manager.getHistory());
     }
 }

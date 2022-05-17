@@ -1,8 +1,16 @@
+package ru.yandex.practicum.service;
+
+import ru.yandex.practicum.model.Epic;
+import ru.yandex.practicum.model.SubTask;
+import ru.yandex.practicum.model.Task;
+
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 
 public class InMemoryTaskManager implements TaskManager {
+
     private final HistoryManager historyManager = Managers.getDefaultHistory();
     private final HashMap<Integer, Task> tasks;
     private final HashMap<Integer, Epic> epics;
@@ -13,6 +21,12 @@ public class InMemoryTaskManager implements TaskManager {
         this.tasks = new HashMap<>();
         this.epics = new HashMap<>();
         this.subTasks = new HashMap<>();
+    }
+
+    //получение истории
+    @Override
+    public List<Task> getHistory() {
+        return historyManager.getHistory();
     }
 
     //    создание задач, эпиков, подзадач
@@ -69,19 +83,25 @@ public class InMemoryTaskManager implements TaskManager {
     //    получение задач, эпиков, подзадач по идентификатору
     @Override
     public Task getTaskById(int id) {
-        historyManager.add(tasks.get(id));
+        if (!(tasks.get(id) == null)) {
+            historyManager.add(tasks.get(id));
+        }
         return tasks.get(id);
     }
 
     @Override
     public Epic getEpicById(int id) {
-        historyManager.add(epics.get(id));
+        if (!(epics.get(id) == null)) {
+            historyManager.add(epics.get(id));
+        }
         return epics.get(id);
     }
 
     @Override
     public SubTask getSubTaskById(int id) {
-        historyManager.add(subTasks.get(id));
+        if (!(subTasks.get(id) == null)) {
+            historyManager.add(subTasks.get(id));
+        }
         return subTasks.get(id);
     }
 
@@ -207,7 +227,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public String toString() {
-        return "InMemoryTaskManager{" +
+        return "ru.yandex.practicum.service.InMemoryTaskManager{" +
                 "historyManager=" + historyManager +
                 ", tasks=" + tasks +
                 ", epics=" + epics +

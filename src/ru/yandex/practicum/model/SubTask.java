@@ -1,3 +1,7 @@
+package ru.yandex.practicum.model;
+
+import ru.yandex.practicum.service.*;
+
 import java.util.Objects;
 
 public class SubTask extends Task {
@@ -36,7 +40,7 @@ public class SubTask extends Task {
 
     @Override
     public String toString() {
-        return "SubTask{" +
+        return "ru.yandex.practicum.model.SubTask{" +
                 "epicId=" + epicId +
                 "} " + super.toString();
     }

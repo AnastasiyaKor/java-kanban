@@ -1,3 +1,7 @@
+package ru.yandex.practicum.model;
+
+import ru.yandex.practicum.service.*;
+
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -34,7 +38,7 @@ public class Epic extends Task {
 
     @Override
     public String toString() {
-        return "Epic{" +
+        return "ru.yandex.practicum.model.Epic{" +
                 "subTasksId=" + subTasksId +
                 "} " + super.toString();
     }
