@@ -5,8 +5,7 @@ import java.util.Objects;
 class InMemoryHistoryManager implements HistoryManager {
     List<Task> viewedTasks = new ArrayList<>();
     int MAXI_ITEMS_IN_THE_LIST = 10;
-
-
+    
     // просмотр истории
     @Override
     public List<Task> getHistory() {
@@ -30,7 +29,6 @@ class InMemoryHistoryManager implements HistoryManager {
             viewedTasks.remove(0);
         }
     }
-
 
     @Override
     public boolean equals(Object o) {
