@@ -8,5 +8,7 @@ public interface HistoryManager {
 
     void add(Task task);//помечает задачи, как просмотренные
 
+    boolean remove(int id);
+
     List<Task> getHistory();//возвращает задачи в список
 }

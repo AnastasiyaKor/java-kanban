@@ -1,28 +1,78 @@
 package ru.yandex.practicum.service;
 
-import ru.yandex.practicum.model.Task;
+import ru.yandex.practicum.model.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 class InMemoryHistoryManager implements HistoryManager {
-    private List<Task> viewedTasks = new ArrayList<>();
-    private int MAXI_ITEMS_IN_THE_LIST = 10;
+    Map<Integer, Node> customLinkedList = new LinkedHashMap<>();
+    private Node<Task> head;
+    private Node<Task> tail;
+    private int size = 0;
 
-    // просмотр истории
-    @Override
-    public List<Task> getHistory() {
-        return viewedTasks;
+    //добавление задачи в конец списка
+    public void linkLast(Task task) {
+        if (size == 0) {
+            head = new Node<>(null, task, null);
+            tail = head;
+        } else {
+            Node secondTail = tail;
+            tail = new Node<>(secondTail, task, null);
+            secondTail.next = tail;
+        }
+        size++;
+        customLinkedList.put(task.getId(), tail);
     }
 
     //обновление истории
     @Override
     public void add(Task task) {
-        if (viewedTasks.size() == MAXI_ITEMS_IN_THE_LIST) {
-            viewedTasks.remove(0);
+        if (customLinkedList.containsKey(task.getId())) {
+            removeNode(customLinkedList.get(task.getId()));
         }
-        viewedTasks.add(task);
+        linkLast(task);
+    }
+
+    // просмотр истории
+    @Override
+    public List<Task> getHistory() {
+        return getTask();
+    }
+
+    //сбор задач в список
+    private List<Task> getTask() {
+        List<Task> linkLastList = new ArrayList<>();
+        for (Node<Task> node : customLinkedList.values()) {
+            linkLastList.add(node.task);
+        }
+        return linkLastList;
+    }
+
+    @Override
+    public boolean remove(int id) {
+        removeNode(customLinkedList.get(id));
+        customLinkedList.remove(id);
+        return false;
+    }
+
+    //удаление ноды
+    public boolean removeNode(Node node) {
+        Node node1 = node;
+        Node nodeNext = node.next;
+        Node nodePrev = node.prev;
+
+        if (nodeNext != null) {
+            nodeNext.prev = nodePrev;
+        } else {
+            tail = nodePrev;
+        }
+        if (nodePrev != null) {
+            nodePrev.next = nodeNext;
+        } else {
+            head = nodeNext;
+        }
+        size--;
+        return true;
     }
 
     @Override
@@ -30,18 +80,21 @@ class InMemoryHistoryManager implements HistoryManager {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         InMemoryHistoryManager that = (InMemoryHistoryManager) o;
-        return MAXI_ITEMS_IN_THE_LIST == that.MAXI_ITEMS_IN_THE_LIST && viewedTasks.equals(that.viewedTasks);
+        return size == that.size && Objects.equals(customLinkedList, that.customLinkedList) && Objects.equals(head, that.head) && Objects.equals(tail, that.tail);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(MAXI_ITEMS_IN_THE_LIST, viewedTasks);
+        return Objects.hash(customLinkedList, head, tail, size);
     }
 
     @Override
     public String toString() {
-        return "ru.yandex.practicum.service.InMemoryHistoryManager{" +
-                "viewedTasks=" + viewedTasks +
+        return "InMemoryHistoryManager{" +
+                "customLinkedList=" + customLinkedList +
+                ", head=" + head +
+                ", tail=" + tail +
+                ", size=" + size +
                 '}';
     }
 }
