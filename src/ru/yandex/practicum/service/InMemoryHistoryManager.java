@@ -5,7 +5,7 @@ import ru.yandex.practicum.model.*;
 import java.util.*;
 
 class InMemoryHistoryManager implements HistoryManager {
-    Map<Integer, Node> customLinkedList = new LinkedHashMap<>();
+    private Map<Integer, Node> customLinkedList = new LinkedHashMap<>();
     private Node<Task> head;
     private Node<Task> tail;
     private int size = 0;
@@ -42,8 +42,10 @@ class InMemoryHistoryManager implements HistoryManager {
     //сбор задач в список
     private List<Task> getTask() {
         List<Task> linkLastList = new ArrayList<>();
-        for (Node<Task> node : customLinkedList.values()) {
+        Node<Task> node = head;
+        while (node != null) {
             linkLastList.add(node.task);
+            node = node.next;
         }
         return linkLastList;
     }
@@ -57,7 +59,6 @@ class InMemoryHistoryManager implements HistoryManager {
 
     //удаление ноды
     public boolean removeNode(Node node) {
-        Node node1 = node;
         Node nodeNext = node.next;
         Node nodePrev = node.prev;
 
@@ -96,5 +97,19 @@ class InMemoryHistoryManager implements HistoryManager {
                 ", tail=" + tail +
                 ", size=" + size +
                 '}';
+    }
+
+    private static class Node<Task> {
+
+        public Node<Task> prev;
+        public Task task;
+        public Node<Task> next;
+
+        public Node(Node<Task> prev, Task task, Node<Task> next) {
+            this.prev = prev;
+            this.task = task;
+            this.next = next;
+
+        }
     }
 }

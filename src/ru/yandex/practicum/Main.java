@@ -32,17 +32,24 @@ public class Main {
         manager.getEpicById(6);//помыть аквариум
         manager.getTaskById(1); //накормить кота
         manager.getEpicById(6);//помыть аквариум
+        manager.getSubTaskById(3); //купить молоко
+        manager.getSubTaskById(4); //купить кофе
+        manager.getSubTaskById(5); //купить вафли
         //смотрим историю
+        System.out.println("смотрим историю:");
         System.out.println(manager.getHistory());
         //удалаяем задачу
-        manager.removeEpicById(6);
+        manager.removeEpicById(2);
         //проверяем, удалилась ли задача из истории
         System.out.println("после удаления:");
         System.out.println(manager.getHistory());
         //удалаяем эпик
-        manager.removeEpicById(2);
+        manager.removeEpicById(6);
         //проверяем, удалилась ли задача с подзадачами из истории
         System.out.println("после удаления эпика:");
+        System.out.println(manager.getHistory());
+        manager.clearTasks();
+        System.out.println("после удаления задач:");
         System.out.println(manager.getHistory());
 
     }
