@@ -11,11 +11,11 @@ import java.util.Objects;
 
 public class InMemoryTaskManager implements TaskManager {
 
-    private final HistoryManager historyManager = Managers.getDefaultHistory();
-    private final HashMap<Integer, Task> tasks;
-    private final HashMap<Integer, Epic> epics;
-    private final HashMap<Integer, SubTask> subTasks;
-    private int id = 0;
+    protected final HistoryManager historyManager = Managers.getDefaultHistory();
+    protected final HashMap<Integer, Task> tasks;
+    protected final HashMap<Integer, Epic> epics;
+    protected final HashMap<Integer, SubTask> subTasks;
+    int id = 0;
 
     public InMemoryTaskManager() {
         this.tasks = new HashMap<>();
@@ -243,7 +243,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public String toString() {
-        return "ru.yandex.practicum.service.InMemoryTaskManager{" +
+        return "InMemoryTaskManager{" +
                 "historyManager=" + historyManager +
                 ", tasks=" + tasks +
                 ", epics=" + epics +

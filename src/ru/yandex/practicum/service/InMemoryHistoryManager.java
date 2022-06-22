@@ -5,7 +5,7 @@ import ru.yandex.practicum.model.*;
 import java.util.*;
 
 class InMemoryHistoryManager implements HistoryManager {
-    private Map<Integer, Node> customLinkedList = new HashMap<>();
+    private final Map<Integer, Node> customLinkedList = new HashMap<>();
     private Node<Task> head;
     private Node<Task> tail;
     private int size = 0;
@@ -84,7 +84,8 @@ class InMemoryHistoryManager implements HistoryManager {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         InMemoryHistoryManager that = (InMemoryHistoryManager) o;
-        return size == that.size && Objects.equals(customLinkedList, that.customLinkedList) && Objects.equals(head, that.head) && Objects.equals(tail, that.tail);
+        return size == that.size && Objects.equals(customLinkedList, that.customLinkedList) &&
+                Objects.equals(head, that.head) && Objects.equals(tail, that.tail);
     }
 
     @Override

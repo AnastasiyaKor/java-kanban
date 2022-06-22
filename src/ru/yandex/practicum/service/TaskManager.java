@@ -4,15 +4,16 @@ import ru.yandex.practicum.model.Epic;
 import ru.yandex.practicum.model.SubTask;
 import ru.yandex.practicum.model.Task;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
 public interface TaskManager {
     //   получение истории
-    List<Task> getHistory();
+    List<Task> getHistory() throws IOException;
 
     //    создание задач, эпиков, подзадач
-    void createTasks(Task task);
+    void createTasks(Task task) throws IOException;
 
     void createEpics(Epic epic);
 

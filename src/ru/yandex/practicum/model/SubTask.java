@@ -7,12 +7,12 @@ import java.util.Objects;
 public class SubTask extends Task {
     private int epicId;
 
-    public SubTask(String name, String description, Status status, int epicId) {
-        super(name, description, status);
+    public SubTask(String name, String description, String status, int epicId) {
+        super(name, description, String.valueOf(Status.valueOf(status)));
     }
 
     public SubTask(String name, String description, int epicId) {
-        super(name, description, Status.NEW);
+        super(name, description, String.valueOf(Status.NEW));
         this.epicId = epicId;
     }
 
@@ -40,7 +40,7 @@ public class SubTask extends Task {
 
     @Override
     public String toString() {
-        return "ru.yandex.practicum.model.SubTask{" +
+        return "SubTask{" +
                 "epicId=" + epicId +
                 "} " + super.toString();
     }

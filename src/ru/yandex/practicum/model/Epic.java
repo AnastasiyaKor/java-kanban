@@ -9,8 +9,12 @@ public class Epic extends Task {
     private ArrayList<Integer> subTasksId;
 
     public Epic(String name, String description) {
-        super(name, description, Status.NEW);
+        super(name, description, String.valueOf(Status.NEW));
         this.subTasksId = new ArrayList<>();
+    }
+
+    public Epic(String name, String description, String status) {
+        super(name, description, String.valueOf(Status.NEW));
     }
 
     public ArrayList<Integer> getSubTasksId() {
@@ -38,7 +42,7 @@ public class Epic extends Task {
 
     @Override
     public String toString() {
-        return "ru.yandex.practicum.model.Epic{" +
+        return "Epic{" +
                 "subTasksId=" + subTasksId +
                 "} " + super.toString();
     }

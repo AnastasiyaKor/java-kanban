@@ -10,10 +10,10 @@ public class Task {
     private Status status;
     private int id;
 
-    public Task(String name, String description, Status status) {
+    public Task(String name, String description, String status) {
         this.name = name;
         this.description = description;
-        this.status = status;
+        this.status = Status.valueOf(status);
     }
 
     public Task(String name, String description) {
@@ -70,7 +70,7 @@ public class Task {
 
     @Override
     public String toString() {
-        return "ru.yandex.practicum.model.Task{" +
+        return "Task{" +
                 "name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", status=" + status +
