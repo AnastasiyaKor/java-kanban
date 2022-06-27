@@ -7,17 +7,33 @@ import ru.yandex.practicum.model.Task;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import static ru.yandex.practicum.service.TaskType.*;
 
 public class FileBackedTasksManager extends InMemoryTaskManager implements TaskManager {
 
+    protected File fileCSV;
+
+    public FileBackedTasksManager(File fileCSV) {
+        if (Files.exists(Paths.get(String.valueOf(fileCSV)))) {
+            try {
+                Files.delete(Paths.get(String.valueOf(fileCSV)));
+                this.fileCSV = new File("csvSave.csv");
+            } catch (IOException exp) {
+                System.out.println("Ошибка при попытке удаления существующего файла для пересоздания");
+                exp.printStackTrace();
+            }
+        } else {
+            this.fileCSV = new File("csvSave.csv");
+        }
+    }
+
     // сохранение в историю
-    public void save() {
-        try (FileWriter fileWriter = new FileWriter("csvSave.csv")) {
+    private void save() {
+        try (FileWriter fileWriter = new FileWriter(fileCSV)) {
             for (Task task : tasks.values()) {
                 fileWriter.write(toStringTask(task));
                 fileWriter.write("\n");
@@ -30,52 +46,60 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
                 fileWriter.write(toStringSubtask(task));
                 fileWriter.write("\n");
             }
+            fileWriter.write(" ");
+            fileWriter.write("\n");
             fileWriter.write(toStringHistory(historyManager));
+            throw new ManagerSaveException("Произошла проблема с сохранением в файл FileBackedTasksManager");
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (ManagerSaveException m) {
+            m.getMessage();
         }
     }
 
-    public String toStringTask(Task task) {
+    private String toStringTask(Task task) {
         return task.getId() + "," + TASK + "," + task.getName() + "," + task.getStatus() + "," + task.getDescription();
     }
 
-    public String toStringEpic(Epic epic) {
+    private String toStringEpic(Epic epic) {
         return epic.getId() + "," + EPIC + "," + epic.getName() + "," + epic.getStatus() + ","
-                + epic.getDescription();
+                + epic.getDescription() + epic.getSubTasksId();
     }
 
-    public String toStringSubtask(SubTask subTask) {
+    private String toStringSubtask(SubTask subTask) {
         return subTask.getId() + "," + SUB_TASK + "," + subTask.getName() + "," + subTask.getStatus() + ","
                 + subTask.getDescription() + "," + subTask.getEpicId();
     }
 
     //подготовка истории к сохранению в строку
-    public String toStringHistory(HistoryManager manager) {
+    private String toStringHistory(HistoryManager manager) {
         StringBuilder sb = new StringBuilder();
         for (Task task : manager.getHistory()) {
             sb.append(task.getId());
-            sb.append(",");
+            sb.append(" ");
         }
-        String history = String.valueOf(sb);
-        return history;
+        String history = sb.toString();
+        String[] split = history.split(" ");
+        return String.join(",", split);
     }
 
     //метод создания истории из строки
-    public List<Integer> fromStringHistory(String value) {
+    private List<Integer> fromStringHistory(String fileCSV) {
         List<Integer> historyId = new ArrayList<>();
-        String line = toStringHistory(historyManager);
-        String[] split = line.split(",");
-        for (String str : split) {
-            historyId.add(Integer.parseInt(str));
+        if (historyManager != null) {
+            String line = toStringHistory(historyManager);
+            String[] split = line.split(",");
+            for (int i = 1; i < split.length; i++) {
+                historyId.add(i);
+            }
         }
         return historyId;
     }
 
     //метод создания задачи из строки
-    public void fromString(String value) {
+    private void fromString(String fileCSV) {
         try {
-            String lines = Files.readString(Path.of("csvSave.csv"));
+            String lines = Files.readString(Path.of(fileCSV));
             String[] splitLines = lines.split(System.lineSeparator());
             Task task;
             for (String line : splitLines) {
@@ -91,23 +115,17 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
                     subTasks.put((Integer.valueOf(split.get(0))), (SubTask) task);
                 }
             }
+            fromStringHistory(fileCSV);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     //восстановление данных менеджера из файла
-    public FileBackedTasksManager loadFromFile(File file) {
-        fromString("csvSave.csv");
-        fromStringHistory("csvSave.csv");
-        return new FileBackedTasksManager();
-    }
-
-    @Override
-    public List<Task> getHistory() {
-        List<Task> fileGetHistory = super.getHistory();
-        save();
-        return fileGetHistory;
+    public static FileBackedTasksManager loadFromFile(File fileCSV) {
+        FileBackedTasksManager fb = new FileBackedTasksManager(new File("csvSave.csv"));
+        fb.fromString("csvSave.csv");
+        return fb;
     }
 
     @Override
@@ -126,27 +144,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     public void createSubTasks(SubTask subTask) {
         super.createSubTasks(subTask);
         save();
-    }
-
-    @Override
-    public HashMap<Integer, Task> getAllTasks() {
-        HashMap<Integer, Task> getAllTasks = super.getAllTasks();
-        save();
-        return getAllTasks;
-    }
-
-    @Override
-    public HashMap<Integer, Epic> getAllEpics() {
-        HashMap<Integer, Epic> getAllEpics = super.getAllEpics();
-        save();
-        return getAllEpics;
-    }
-
-    @Override
-    public HashMap<Integer, SubTask> getAllSubTasks() {
-        HashMap<Integer, SubTask> getAllSubTasks = super.getAllSubTasks();
-        save();
-        return getAllSubTasks;
     }
 
     @Override
@@ -170,8 +167,50 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         return getSubTaskById;
     }
 
+    @Override
+    public void refreshTasks(Task task) {
+        super.refreshTasks(task);
+        save();
+    }
+
+    @Override
+    public void refreshEpics(Epic epic) {
+        super.refreshEpics(epic);
+        save();
+    }
+
+    @Override
+    public void refreshSubTasks(SubTask subTask) {
+        super.refreshSubTasks(subTask);
+        save();
+    }
+
+    @Override
+    public void refreshStatusEpic(int epicId) {
+        super.refreshStatusEpic(epicId);
+        save();
+    }
+
+    @Override
+    public void removeTaskById(int id) {
+        super.removeTaskById(id);
+        save();
+    }
+
+    @Override
+    public void removeEpicById(int id) {
+        super.removeEpicById(id);
+        save();
+    }
+
+    @Override
+    public void removeSubTaskById(int id) {
+        super.removeSubTaskById(id);
+        save();
+    }
+
     public static void main(String[] args) {
-        FileBackedTasksManager fb = new FileBackedTasksManager();
+        FileBackedTasksManager fb = new FileBackedTasksManager(new File("csvSave.csv"));
         Task task1 = new Task("Task1", "Task1 Description");
         fb.createTasks(task1);
         Task task2 = new Task("Task2", "Task2 Description");
@@ -198,13 +237,8 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         fb.getSubTaskById(3); //купить молоко
         fb.getSubTaskById(4); //купить кофе
         fb.getSubTaskById(5); //купить вафли
-        //смотрим историю
-        System.out.println("смотрим историю:");
-        System.out.println(fb.getHistory());
-        fb.fromString("csvSave.csv");
-        fb.loadFromFile(new File("csvSave"));
+        fb.getHistory();//смотрим историю
     }
-
 }
 
 
