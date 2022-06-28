@@ -5,35 +5,25 @@ import ru.yandex.practicum.model.SubTask;
 import ru.yandex.practicum.model.Task;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 import static ru.yandex.practicum.service.TaskType.*;
 
-public class FileBackedTasksManager extends InMemoryTaskManager implements TaskManager {
+public class FileBackedTasksManager extends InMemoryTaskManager {
 
-    protected File fileCSV;
+    private final File fileCSV;
+    private static final String FILE_HEADER = "id,type,name,status,description,epic";
 
     public FileBackedTasksManager(File fileCSV) {
-        if (Files.exists(Paths.get(String.valueOf(fileCSV)))) {
-            try {
-                Files.delete(Paths.get(String.valueOf(fileCSV)));
-                this.fileCSV = new File("csvSave.csv");
-            } catch (IOException exp) {
-                System.out.println("Ошибка при попытке удаления существующего файла для пересоздания");
-                exp.printStackTrace();
-            }
-        } else {
-            this.fileCSV = new File("csvSave.csv");
-        }
+        this.fileCSV = fileCSV;
     }
 
     // сохранение в историю
     private void save() {
         try (FileWriter fileWriter = new FileWriter(fileCSV)) {
+            fileWriter.write(FILE_HEADER);
+            fileWriter.write("\n");
             for (Task task : tasks.values()) {
                 fileWriter.write(toStringTask(task));
                 fileWriter.write("\n");
@@ -49,26 +39,25 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
             fileWriter.write(" ");
             fileWriter.write("\n");
             fileWriter.write(toStringHistory(historyManager));
-            throw new ManagerSaveException("Произошла проблема с сохранением в файл FileBackedTasksManager");
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (ManagerSaveException m) {
-            m.getMessage();
+            throw new ManagerSaveException("Произошла проблема с сохранением в файл FileBackedTasksManager");
         }
     }
 
     private String toStringTask(Task task) {
-        return task.getId() + "," + TASK + "," + task.getName() + "," + task.getStatus() + "," + task.getDescription();
+        return task.getId() + "," + TASK + "," + task.getName() + "," + task.getStatus() + ","
+                + task.getDescription();
     }
 
     private String toStringEpic(Epic epic) {
         return epic.getId() + "," + EPIC + "," + epic.getName() + "," + epic.getStatus() + ","
-                + epic.getDescription() + epic.getSubTasksId();
+                + epic.getDescription();
     }
 
     private String toStringSubtask(SubTask subTask) {
-        return subTask.getId() + "," + SUB_TASK + "," + subTask.getName() + "," + subTask.getStatus() + ","
-                + subTask.getDescription() + "," + subTask.getEpicId();
+        return subTask.getId() + "," + SUB_TASK + "," + subTask.getName() + ","
+                + subTask.getStatus() + "," + subTask.getDescription() + "," + subTask.getEpicId();
     }
 
     //подготовка истории к сохранению в строку
@@ -86,11 +75,13 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     //метод создания истории из строки
     private List<Integer> fromStringHistory(String fileCSV) {
         List<Integer> historyId = new ArrayList<>();
-        if (historyManager != null) {
-            String line = toStringHistory(historyManager);
-            String[] split = line.split(",");
-            for (int i = 1; i < split.length; i++) {
-                historyId.add(i);
+        if (fileCSV.isBlank()) {
+            if (historyManager != null) {
+                String line = toStringHistory(historyManager);
+                String[] split = line.split(",");
+                for (int i = 1; i < split.length; i++) {
+                    historyId.add(i);
+                }
             }
         }
         return historyId;
@@ -98,24 +89,37 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
 
     //метод создания задачи из строки
     private void fromString(String fileCSV) {
-        try {
-            String lines = Files.readString(Path.of(fileCSV));
-            String[] splitLines = lines.split(System.lineSeparator());
+        try (FileReader reader = new FileReader(fileCSV);
+             BufferedReader br = new BufferedReader(reader)) {
+            String line1 = br.readLine();
+            String line;
+            List<String> split;
             Task task;
-            for (String line : splitLines) {
-                List<String> split = List.of(line.split(","));
-                if (split.get(1).equals(String.valueOf(TASK))) {
-                    task = new Task(split.get(2), split.get(4), split.get(3));
-                    tasks.put(Integer.valueOf(split.get(0)), task);
-                } else if (split.get(1).equals(String.valueOf(EPIC))) {
-                    task = new Epic(split.get(2), split.get(4), split.get(3));
-                    epics.put((Integer.valueOf(split.get(0))), (Epic) task);
-                } else if (split.get(1).equals(String.valueOf(SUB_TASK))) {
-                    task = new SubTask(split.get(2), split.get(4), split.get(3), Integer.parseInt(split.get(5)));
-                    subTasks.put((Integer.valueOf(split.get(0))), (SubTask) task);
+            while (br.ready()) {
+                line = br.readLine();
+                if (!(line.equals(" "))) {
+                    split = List.of(line.split(","));
+                    if (split.get(1).equals(String.valueOf(TASK))) {
+                        task = new Task(split.get(2), split.get(4), split.get(3));
+                        tasks.put(Integer.valueOf(split.get(0)), task);
+                    } else if (split.get(1).equals(String.valueOf(EPIC))) {
+                        task = new Epic(split.get(2), split.get(4), split.get(3));
+                        epics.put((Integer.valueOf(split.get(0))), (Epic) task);
+                    } else if (split.get(1).equals(String.valueOf(SUB_TASK))) {
+                        task = new SubTask(split.get(2), split.get(4), split.get(3),
+                                Integer.parseInt(split.get(5)));
+                        subTasks.put((Integer.valueOf(split.get(0))), (SubTask) task);
+                        if (getSubtasksByEpicId(Integer.parseInt(split.get(5))) != null) {
+                            getSubtasksByEpicId(Integer.parseInt(split.get(5))).add((Integer.valueOf(split.get(0))));
+                        }
+                    }
+                    if (Integer.parseInt(split.get(0)) > id) {
+                        id = Integer.parseInt(split.get(0));
+                    }
+                } else {
+                    return;
                 }
             }
-            fromStringHistory(fileCSV);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -123,8 +127,9 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
 
     //восстановление данных менеджера из файла
     public static FileBackedTasksManager loadFromFile(File fileCSV) {
-        FileBackedTasksManager fb = new FileBackedTasksManager(new File("csvSave.csv"));
+        FileBackedTasksManager fb = new FileBackedTasksManager(new File(String.valueOf(fileCSV)));
         fb.fromString("csvSave.csv");
+        fb.fromStringHistory("csvSave.csv");
         return fb;
     }
 
@@ -238,6 +243,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         fb.getSubTaskById(4); //купить кофе
         fb.getSubTaskById(5); //купить вафли
         fb.getHistory();//смотрим историю
+        FileBackedTasksManager fileBackedTasksManager = loadFromFile(new File("csvSave.csv"));
     }
 }
 
