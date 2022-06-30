@@ -1,10 +1,10 @@
 id,type,name,status,description,epic
 0,TASK,Task1,NEW,Task1 Description
-0,TASK,Task2,NEW,Task2 Description
-0,EPIC,Epic1,NEW,Epic1 Description
-0,EPIC,Epic2,NEW,Epic2 Description
-0,SUB_TASK,Sub Task1,NEW,Sub Task1 Description,0
-0,SUB_TASK,Sub Task2,NEW,Sub Task2 Description,0
-0,SUB_TASK,Sub Task3,NEW,Sub Task3 Description,0
- 
-0
+1,TASK,Task2,NEW,Task2 Description
+2,EPIC,Epic1,NEW,Epic1 Description
+6,EPIC,Epic2,NEW,Epic2 Description
+3,SUB_TASK,Sub Task1,NEW,Sub Task1 Description,2
+4,SUB_TASK,Sub Task2,NEW,Sub Task2 Description,2
+5,SUB_TASK,Sub Task3,NEW,Sub Task3 Description,2
+
+2,0,1,6,3,4,5

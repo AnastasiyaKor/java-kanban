@@ -1,13 +1,10 @@
 package ru.yandex.practicum.service;
 
-import java.io.File;
-
 
 public class Managers {
 
-
     public static TaskManager getDefault() {
-        return new FileBackedTasksManager(new File("csvSave.csv"));
+        return new InMemoryTaskManager();
     }
 
     public static HistoryManager getDefaultHistory() {

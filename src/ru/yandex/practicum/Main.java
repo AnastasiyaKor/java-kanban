@@ -9,7 +9,6 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         TaskManager manager = Managers.getDefault();
-
         //создаем 2 задачи
         Task task1 = new Task("Полить цветы", "полить все цветы на кухне");
         manager.createTasks(task1);
@@ -53,6 +52,5 @@ public class Main {
         manager.clearTasks();
         System.out.println("после удаления задач:");
         System.out.println(manager.getHistory());
-
     }
 }

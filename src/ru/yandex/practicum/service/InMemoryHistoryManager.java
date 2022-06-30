@@ -93,15 +93,6 @@ class InMemoryHistoryManager implements HistoryManager {
         return Objects.hash(customLinkedList, head, tail, size);
     }
 
-    @Override
-    public String toString() {
-        return "InMemoryHistoryManager{" +
-                "customLinkedList=" + customLinkedList +
-                ", head=" + head +
-                ", tail=" + tail +
-                ", size=" + size +
-                '}';
-    }
 
     private static class Node<Task> {
 

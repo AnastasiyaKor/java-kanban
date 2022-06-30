@@ -17,6 +17,10 @@ public class Epic extends Task {
         super(name, description, status);
     }
 
+    public Epic(String name, String description, String status, int id) {
+        super(name, description, status, id);
+    }
+
     public ArrayList<Integer> getSubTasksId() {
         return subTasksId;
     }
@@ -43,7 +47,6 @@ public class Epic extends Task {
     @Override
     public String toString() {
         return "Epic{" +
-                "subTasksId=" + subTasksId +
                 "} " + super.toString();
     }
 }

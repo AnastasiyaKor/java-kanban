@@ -12,16 +12,16 @@ import static ru.yandex.practicum.service.TaskType.*;
 
 public class FileBackedTasksManager extends InMemoryTaskManager {
 
-    private final File fileCSV;
+    private final File scvSave;
     private static final String FILE_HEADER = "id,type,name,status,description,epic";
 
-    public FileBackedTasksManager(File fileCSV) {
-        this.fileCSV = fileCSV;
+    public FileBackedTasksManager(File scvSave) {
+        this.scvSave = scvSave;
     }
 
-    // сохранение в историю
+    // сохранение в файл
     private void save() {
-        try (FileWriter fileWriter = new FileWriter(fileCSV)) {
+        try (FileWriter fileWriter = new FileWriter("csvSave.csv")) {
             fileWriter.write(FILE_HEADER);
             fileWriter.write("\n");
             for (Task task : tasks.values()) {
@@ -36,7 +36,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                 fileWriter.write(toStringSubtask(task));
                 fileWriter.write("\n");
             }
-            fileWriter.write(" ");
             fileWriter.write("\n");
             fileWriter.write(toStringHistory(historyManager));
         } catch (IOException e) {
@@ -60,64 +59,73 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                 + subTask.getStatus() + "," + subTask.getDescription() + "," + subTask.getEpicId();
     }
 
-    //подготовка истории к сохранению в строку
+    //сохранение в файл
     private String toStringHistory(HistoryManager manager) {
+        List<Task> history = new ArrayList<>(manager.getHistory());
         StringBuilder sb = new StringBuilder();
+        if (history.isEmpty()) {
+            System.out.println("История просмотров пустая");
+            return sb.toString();
+        }
         for (Task task : manager.getHistory()) {
             sb.append(task.getId());
             sb.append(" ");
         }
-        String history = sb.toString();
-        String[] split = history.split(" ");
+        String str = sb.toString();
+        String[] split = str.split(" ");
         return String.join(",", split);
     }
 
     //метод создания истории из строки
-    private List<Integer> fromStringHistory(String fileCSV) {
+    private List<Integer> fromStringHistory(File file) {
         List<Integer> historyId = new ArrayList<>();
-        if (fileCSV.isBlank()) {
-            if (historyManager != null) {
-                String line = toStringHistory(historyManager);
-                String[] split = line.split(",");
-                for (int i = 1; i < split.length; i++) {
-                    historyId.add(i);
+        try (FileReader reader = new FileReader(file);
+             BufferedReader br = new BufferedReader(reader)) {
+            br.readLine();
+            String line;
+            while (br.ready()) {
+                line = br.readLine();
+                if (line.equals("")) {
+                    line = br.readLine();
+                    String line1 = br.readLine();
+                    String[] split = line.split(",");
+                    for (String str : split) {
+                        historyId.add(Integer.parseInt(str));
+                    }
                 }
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return historyId;
     }
 
     //метод создания задачи из строки
-    private void fromString(String fileCSV) {
-        try (FileReader reader = new FileReader(fileCSV);
+    private void fromString(File file) {
+        Task task;
+        try (FileReader reader = new FileReader(file);
              BufferedReader br = new BufferedReader(reader)) {
-            String line1 = br.readLine();
+            br.readLine();
             String line;
             List<String> split;
-            Task task;
             while (br.ready()) {
                 line = br.readLine();
-                if (!(line.equals(" "))) {
+                if (!(line.equals(""))) {
                     split = List.of(line.split(","));
                     if (split.get(1).equals(String.valueOf(TASK))) {
-                        task = new Task(split.get(2), split.get(4), split.get(3));
-                        tasks.put(Integer.valueOf(split.get(0)), task);
+                        task = new Task(split.get(2), split.get(4), split.get(3), Integer.parseInt(split.get(0)));
+                        tasks.put(Integer.parseInt(split.get(0)), task);
                     } else if (split.get(1).equals(String.valueOf(EPIC))) {
-                        task = new Epic(split.get(2), split.get(4), split.get(3));
-                        epics.put((Integer.valueOf(split.get(0))), (Epic) task);
+                        task = new Epic(split.get(2), split.get(4), split.get(3), Integer.parseInt(split.get(0)));
+                        epics.put((Integer.parseInt(split.get(0))), (Epic) task);
                     } else if (split.get(1).equals(String.valueOf(SUB_TASK))) {
-                        task = new SubTask(split.get(2), split.get(4), split.get(3),
+                        task = new SubTask(split.get(2), split.get(4), split.get(3), Integer.parseInt(split.get(0)),
                                 Integer.parseInt(split.get(5)));
-                        subTasks.put((Integer.valueOf(split.get(0))), (SubTask) task);
-                        if (getSubtasksByEpicId(Integer.parseInt(split.get(5))) != null) {
-                            getSubtasksByEpicId(Integer.parseInt(split.get(5))).add((Integer.valueOf(split.get(0))));
-                        }
+                        subTasks.put((Integer.parseInt(split.get(0))), (SubTask) task);
                     }
                     if (Integer.parseInt(split.get(0)) > id) {
                         id = Integer.parseInt(split.get(0));
                     }
-                } else {
-                    return;
                 }
             }
         } catch (IOException e) {
@@ -126,10 +134,10 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     //восстановление данных менеджера из файла
-    public static FileBackedTasksManager loadFromFile(File fileCSV) {
-        FileBackedTasksManager fb = new FileBackedTasksManager(new File(String.valueOf(fileCSV)));
-        fb.fromString("csvSave.csv");
-        fb.fromStringHistory("csvSave.csv");
+    public static FileBackedTasksManager loadFromFile(File file) {
+        FileBackedTasksManager fb = new FileBackedTasksManager(file);
+        fb.fromString(file);
+        fb.fromStringHistory(file);
         return fb;
     }
 
@@ -214,6 +222,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         save();
     }
 
+
     public static void main(String[] args) {
         FileBackedTasksManager fb = new FileBackedTasksManager(new File("csvSave.csv"));
         Task task1 = new Task("Task1", "Task1 Description");
@@ -233,17 +242,21 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         Epic epic2 = new Epic("Epic2", "Epic2 Description");
         fb.createEpics(epic2);
 
-        fb.getEpicById(6);//помыть аквариум
-        fb.getEpicById(2); //сходить в магазин
-        fb.getTaskById(0); //полить цветы
-        fb.getEpicById(6);//помыть аквариум
-        fb.getTaskById(1); //накормить кота
-        fb.getEpicById(6);//помыть аквариум
-        fb.getSubTaskById(3); //купить молоко
-        fb.getSubTaskById(4); //купить кофе
-        fb.getSubTaskById(5); //купить вафли
-        fb.getHistory();//смотрим историю
+        System.out.println(fb.getEpicById(6));//помыть аквариум
+        System.out.println(fb.getEpicById(2)); //сходить в магазин/2
+        System.out.println(fb.getTaskById(0)); //полить цветы/0
+        System.out.println(fb.getEpicById(6));//помыть аквариум
+        System.out.println(fb.getTaskById(1)); //накормить кота/1
+        System.out.println(fb.getEpicById(6));//помыть аквариум/6
+        System.out.println(fb.getSubTaskById(3)); //купить молоко/3
+        System.out.println(fb.getSubTaskById(4)); //купить кофе/4
+        System.out.println(fb.getSubTaskById(5)); //купить вафли/5
+        System.out.println("Смотрим историю:");
+        System.out.println(fb.getHistory());//смотрим историю
+        System.out.println("Восстановление из файла:");
         FileBackedTasksManager fileBackedTasksManager = loadFromFile(new File("csvSave.csv"));
+        System.out.println(fileBackedTasksManager);
+
     }
 }
 
