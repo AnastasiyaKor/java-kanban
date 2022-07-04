@@ -15,7 +15,7 @@ public class InMemoryTaskManager implements TaskManager {
     protected final HashMap<Integer, Task> tasks;
     protected final HashMap<Integer, Epic> epics;
     protected final HashMap<Integer, SubTask> subTasks;
-    int id = 0;
+    protected int id = 0;
 
     public InMemoryTaskManager() {
         this.tasks = new HashMap<>();
@@ -106,8 +106,8 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     public ArrayList<Integer> getSubtasksByEpicId(int epicId) {
-        if (getEpicById(epicId) != null) {
-            return getEpicById(epicId).getSubTasksId();
+        if (epics.get(epicId) != null) {
+            return epics.get(epicId).getSubTasksId();
         } else {
             return null;
         }
@@ -138,14 +138,14 @@ public class InMemoryTaskManager implements TaskManager {
 
     //    обновление статуса эпика
     public void refreshStatusEpic(int epicId) {
-        Epic epic = getEpicById(epicId);
+        Epic epic = epics.get(epicId);
         int newStatus = 0;
         int done = 0;
         if (getSubtasksByEpicId(epicId) != null) {
             for (Integer i : getSubtasksByEpicId(epicId)) {
-                if (getSubTaskById(i).getStatus().equals(Status.NEW)) {
+                if (subTasks.get(i).getStatus().equals(Status.NEW)) {
                     newStatus++;
-                } else if (getSubTaskById(i).getStatus().equals(Status.DONE)) {
+                } else if (subTasks.get(i).getStatus().equals(Status.DONE)) {
                     done++;
                 } else {
                     epic.setStatus(Status.IN_PROGRESS);
@@ -198,7 +198,7 @@ public class InMemoryTaskManager implements TaskManager {
     //    удаление задач, эпиков, подзадач по  идентификатору
     @Override
     public void removeTaskById(int id) {
-        if (getTaskById(id) != null) {
+        if (tasks.get(id) != null) {
             tasks.remove(id);
             historyManager.remove(id);
         }
@@ -218,9 +218,9 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void removeSubTaskById(int id) {
-        if (getSubtasksByEpicId(getSubTaskById(id).getEpicId()) != null) {
-            getSubtasksByEpicId(getSubTaskById(id).getEpicId()).remove((Integer) id);
-            refreshStatusEpic(getSubTaskById(id).getEpicId());
+        if (getSubtasksByEpicId(subTasks.get(id).getEpicId()) != null) {
+            getSubtasksByEpicId(subTasks.get(id).getEpicId()).remove((Integer) id);
+            refreshStatusEpic(subTasks.get(id).getEpicId());
             subTasks.remove(id);
             historyManager.remove(id);
         }

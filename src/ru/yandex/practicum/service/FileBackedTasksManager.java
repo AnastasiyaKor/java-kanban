@@ -21,7 +21,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
     // сохранение в файл
     private void save() {
-        try (FileWriter fileWriter = new FileWriter("csvSave.csv")) {
+        try (FileWriter fileWriter = new FileWriter(scvSave)) {
             fileWriter.write(FILE_HEADER);
             fileWriter.write("\n");
             for (Task task : tasks.values()) {
@@ -59,17 +59,15 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                 + subTask.getStatus() + "," + subTask.getDescription() + "," + subTask.getEpicId();
     }
 
-    //сохранение в файл
+    //сохранение истории в файл
     private String toStringHistory(HistoryManager manager) {
         List<Task> history = new ArrayList<>(manager.getHistory());
         StringBuilder sb = new StringBuilder();
-        if (history.isEmpty()) {
-            System.out.println("История просмотров пустая");
-            return sb.toString();
-        }
-        for (Task task : manager.getHistory()) {
-            sb.append(task.getId());
-            sb.append(" ");
+        if (!(history.isEmpty())) {
+            for (Task task : manager.getHistory()) {
+                sb.append(task.getId());
+                sb.append(" ");
+            }
         }
         String str = sb.toString();
         String[] split = str.split(" ");
@@ -77,25 +75,13 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     //метод создания истории из строки
-    private List<Integer> fromStringHistory(File file) {
+    private List<Integer> fromStringHistory(String value) {
         List<Integer> historyId = new ArrayList<>();
-        try (FileReader reader = new FileReader(file);
-             BufferedReader br = new BufferedReader(reader)) {
-            br.readLine();
-            String line;
-            while (br.ready()) {
-                line = br.readLine();
-                if (line.equals("")) {
-                    line = br.readLine();
-                    String line1 = br.readLine();
-                    String[] split = line.split(",");
-                    for (String str : split) {
-                        historyId.add(Integer.parseInt(str));
-                    }
-                }
+        if (value != null) {
+            String[] split = value.split(",");
+            for (String str : split) {
+                historyId.add(Integer.parseInt(str));
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
         return historyId;
     }
@@ -103,33 +89,38 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     //метод создания задачи из строки
     private void fromString(File file) {
         Task task;
-        try (FileReader reader = new FileReader(file);
-             BufferedReader br = new BufferedReader(reader)) {
-            br.readLine();
-            String line;
-            List<String> split;
-            while (br.ready()) {
-                line = br.readLine();
-                if (!(line.equals(""))) {
-                    split = List.of(line.split(","));
-                    if (split.get(1).equals(String.valueOf(TASK))) {
-                        task = new Task(split.get(2), split.get(4), split.get(3), Integer.parseInt(split.get(0)));
-                        tasks.put(Integer.parseInt(split.get(0)), task);
-                    } else if (split.get(1).equals(String.valueOf(EPIC))) {
-                        task = new Epic(split.get(2), split.get(4), split.get(3), Integer.parseInt(split.get(0)));
-                        epics.put((Integer.parseInt(split.get(0))), (Epic) task);
-                    } else if (split.get(1).equals(String.valueOf(SUB_TASK))) {
-                        task = new SubTask(split.get(2), split.get(4), split.get(3), Integer.parseInt(split.get(0)),
-                                Integer.parseInt(split.get(5)));
-                        subTasks.put((Integer.parseInt(split.get(0))), (SubTask) task);
-                    }
-                    if (Integer.parseInt(split.get(0)) > id) {
-                        id = Integer.parseInt(split.get(0));
+        if (file != null) {
+            try (FileReader reader = new FileReader(file);
+                 BufferedReader br = new BufferedReader(reader)) {
+                br.readLine();
+                String line;
+                List<String> split;
+                while (br.ready()) {
+                    line = br.readLine();
+                    if (!(line.isBlank())) {
+                        split = List.of(line.split(","));
+                        if (split.get(1).equals(String.valueOf(TASK))) {
+                            task = new Task(split.get(2), split.get(4), split.get(3), Integer.parseInt(split.get(0)));
+                            tasks.put(Integer.parseInt(split.get(0)), task);
+                        } else if (split.get(1).equals(String.valueOf(EPIC))) {
+                            task = new Epic(split.get(2), split.get(4), split.get(3), Integer.parseInt(split.get(0)));
+                            epics.put((Integer.parseInt(split.get(0))), (Epic) task);
+                        } else if (split.get(1).equals(String.valueOf(SUB_TASK))) {
+                            task = new SubTask(split.get(2), split.get(4), split.get(3), Integer.parseInt(split.get(0)),
+                                    Integer.parseInt(split.get(5)));
+                            subTasks.put((Integer.parseInt(split.get(0))), (SubTask) task);
+                        }
+                        if (Integer.parseInt(split.get(0)) > id) {
+                            id = Integer.parseInt(split.get(0));
+                        }
+                    } else {
+                        line = br.readLine();
+                        System.out.println(fromStringHistory(line));
                     }
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -137,7 +128,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     public static FileBackedTasksManager loadFromFile(File file) {
         FileBackedTasksManager fb = new FileBackedTasksManager(file);
         fb.fromString(file);
-        fb.fromStringHistory(file);
         return fb;
     }
 
@@ -243,14 +233,14 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         fb.createEpics(epic2);
 
         System.out.println(fb.getEpicById(6));//помыть аквариум
-        System.out.println(fb.getEpicById(2)); //сходить в магазин/2
-        System.out.println(fb.getTaskById(0)); //полить цветы/0
+        System.out.println(fb.getEpicById(2)); //сходить в магазин
+        System.out.println(fb.getTaskById(0)); //полить цветы
         System.out.println(fb.getEpicById(6));//помыть аквариум
-        System.out.println(fb.getTaskById(1)); //накормить кота/1
-        System.out.println(fb.getEpicById(6));//помыть аквариум/6
-        System.out.println(fb.getSubTaskById(3)); //купить молоко/3
-        System.out.println(fb.getSubTaskById(4)); //купить кофе/4
-        System.out.println(fb.getSubTaskById(5)); //купить вафли/5
+        System.out.println(fb.getTaskById(1)); //накормить кота
+        System.out.println(fb.getEpicById(6));//помыть аквариум
+        System.out.println(fb.getSubTaskById(3)); //купить молоко
+        System.out.println(fb.getSubTaskById(4)); //купить кофе
+        System.out.println(fb.getSubTaskById(5)); //купить вафли
         System.out.println("Смотрим историю:");
         System.out.println(fb.getHistory());//смотрим историю
         System.out.println("Восстановление из файла:");
