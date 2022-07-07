@@ -61,13 +61,10 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
     //сохранение истории в файл
     private String toStringHistory(HistoryManager manager) {
-        List<Task> history = new ArrayList<>(manager.getHistory());
         StringBuilder sb = new StringBuilder();
-        if (!(history.isEmpty())) {
-            for (Task task : manager.getHistory()) {
-                sb.append(task.getId());
-                sb.append(" ");
-            }
+        for (Task task : manager.getHistory()) {
+            sb.append(task.getId());
+            sb.append(" ");
         }
         String str = sb.toString();
         String[] split = str.split(" ");
@@ -90,8 +87,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     private void fromString(File file) {
         Task task;
         if (file != null) {
-            try (FileReader reader = new FileReader(file);
-                 BufferedReader br = new BufferedReader(reader)) {
+            try (FileReader reader = new FileReader(file); BufferedReader br = new BufferedReader(reader)) {
                 br.readLine();
                 String line;
                 List<String> split;
@@ -99,23 +95,39 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                     line = br.readLine();
                     if (!(line.isBlank())) {
                         split = List.of(line.split(","));
-                        if (split.get(1).equals(String.valueOf(TASK))) {
-                            task = new Task(split.get(2), split.get(4), split.get(3), Integer.parseInt(split.get(0)));
-                            tasks.put(Integer.parseInt(split.get(0)), task);
-                        } else if (split.get(1).equals(String.valueOf(EPIC))) {
-                            task = new Epic(split.get(2), split.get(4), split.get(3), Integer.parseInt(split.get(0)));
-                            epics.put((Integer.parseInt(split.get(0))), (Epic) task);
-                        } else if (split.get(1).equals(String.valueOf(SUB_TASK))) {
-                            task = new SubTask(split.get(2), split.get(4), split.get(3), Integer.parseInt(split.get(0)),
-                                    Integer.parseInt(split.get(5)));
-                            subTasks.put((Integer.parseInt(split.get(0))), (SubTask) task);
+                        int idTask = Integer.parseInt(split.get(0));
+                        if (idTask > id) {
+                            id = idTask;
                         }
-                        if (Integer.parseInt(split.get(0)) > id) {
-                            id = Integer.parseInt(split.get(0));
+                        switch (TaskType.valueOf(split.get(1))) {
+                            case TASK:
+                                task = new Task(split.get(2), split.get(4), split.get(3), idTask);
+                                tasks.put(idTask, task);
+                                break;
+                            case EPIC:
+                                task = new Epic(split.get(2), split.get(4), split.get(3), idTask);
+                                epics.put(idTask, (Epic) task);
+                                break;
+                            case SUB_TASK:
+                                task = new SubTask(split.get(2), split.get(4), split.get(3), idTask,
+                                        Integer.parseInt(split.get(5)));
+                                subTasks.put(idTask, (SubTask) task);
+                                getSubtasksByEpicId(Integer.parseInt(split.get(5))).add(idTask);
+                                break;
                         }
                     } else {
                         line = br.readLine();
-                        System.out.println(fromStringHistory(line));
+                        List<Integer> count = fromStringHistory(line);
+                        for (Integer i : count) {
+                            if (tasks.containsKey(i)) {
+                                historyManager.add(tasks.get(i));
+                            } else if (epics.containsKey(i)) {
+                                historyManager.add(epics.get(i));
+                            } else {
+                                historyManager.add(subTasks.get(i));
+                            }
+                        }
+                        System.out.println(historyManager.getHistory()); //для наглядности
                     }
                 }
             } catch (IOException e) {
