@@ -1,4 +1,4 @@
-package ru.yandex.practicum.service;
+package service;
 
 public enum Status {
     NEW,

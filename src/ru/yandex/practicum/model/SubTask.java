@@ -1,20 +1,31 @@
-package ru.yandex.practicum.model;
+package model;
 
-import ru.yandex.practicum.service.*;
+import service.Status;
 
 import java.util.Objects;
 
 public class SubTask extends Task {
     private int epicId;
 
-    public SubTask(String name, String description, String status, int id, int epicId) {
-        super(name, description, status, id);
+    public SubTask(String name, String description, String status, int id, String startTime,
+                   long duration, String endTime, int epicId) {
+        super(name, description, status, id, startTime, duration, endTime);
+        this.epicId = epicId;
+    }
+
+    public SubTask(String name, String description, long duration, int year, int month,
+                   int day, int hours, int minutes, int epicId) {
+        super(name, description, duration, year, month, day, hours, minutes);
         this.epicId = epicId;
     }
 
     public SubTask(String name, String description, int epicId) {
         super(name, description, String.valueOf(Status.NEW));
         this.epicId = epicId;
+    }
+
+    public SubTask(String name, String description) {
+        super(name, description, String.valueOf(Status.NEW));
     }
 
     public int getEpicId() {

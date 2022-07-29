@@ -1,14 +1,18 @@
-package ru.yandex.practicum.service;
+package service;
 
-import ru.yandex.practicum.model.Epic;
-import ru.yandex.practicum.model.SubTask;
-import ru.yandex.practicum.model.Task;
+import model.Epic;
+import model.SubTask;
+import model.Task;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
 public interface TaskManager {
+
+    //получение списка сортировки
+    List<Task> getPrioritizedTasks();
+
     //   получение истории
     List<Task> getHistory() throws IOException;
 

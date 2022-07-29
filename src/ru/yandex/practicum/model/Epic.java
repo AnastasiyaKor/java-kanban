@@ -1,11 +1,12 @@
-package ru.yandex.practicum.model;
+package model;
 
-import ru.yandex.practicum.service.*;
+import service.Status;
 
 import java.util.ArrayList;
 import java.util.Objects;
 
 public class Epic extends Task {
+
     private ArrayList<Integer> subTasksId;
 
     public Epic(String name, String description) {
@@ -13,9 +14,9 @@ public class Epic extends Task {
         this.subTasksId = new ArrayList<>();
     }
 
-    public Epic(String name, String description, String status, int id) {
-
-        super(name, description, status, id);
+    public Epic(String name, String description, String status, int id, String startTime,
+                long duration, String endTime) {
+        super(name, description, status, id, startTime, duration, endTime);
         this.subTasksId = new ArrayList<>();
     }
 
@@ -24,7 +25,6 @@ public class Epic extends Task {
     }
 
     public void setSubTasksId(ArrayList<Integer> subTasksId) {
-
         this.subTasksId = subTasksId;
     }
 
@@ -45,6 +45,7 @@ public class Epic extends Task {
     @Override
     public String toString() {
         return "Epic{" +
+                "subTasksId=" + subTasksId +
                 "} " + super.toString();
     }
 }

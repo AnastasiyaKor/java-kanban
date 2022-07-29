@@ -1,14 +1,14 @@
-package ru.yandex.practicum.service;
+package service;
 
-import ru.yandex.practicum.model.Task;
+import model.Task;
 
 import java.util.List;
 
 public interface HistoryManager {
 
-    void add(Task task);//помечает задачи, как просмотренные
+    void add(Task task);
 
     boolean remove(int id);
 
-    List<Task> getHistory();//возвращает задачи в список
+    List<Task> getHistory();
 }
