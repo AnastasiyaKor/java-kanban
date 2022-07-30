@@ -11,7 +11,7 @@ import static service.TaskType.*;
 public class FileBackedTasksManager extends InMemoryTaskManager {
 
     private final File scvSave;
-    private static final String FILE_HEADER = "id,type,name,status,description,startTime,duration,endTime,epic";
+    private static final String FILE_HEADER = "id,type,name,status,description,startTime,duration,epic";
 
     public FileBackedTasksManager(File scvSave) {
         this.scvSave = scvSave;
@@ -45,20 +45,20 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     private String toStringTask(Task task) {
         return task.getId() + "," + TASK + "," + task.getName() + "," + task.getStatus() + ","
                 + task.getDescription() + "," + task.getStartTime() + ","
-                + task.getDuration() + "," + task.getEndTime();
+                + task.getDuration();
     }
 
     private String toStringEpic(Epic epic) {
         return epic.getId() + "," + EPIC + "," + epic.getName() + "," + epic.getStatus() + ","
                 + epic.getDescription() + "," + epic.getStartTime() + ","
-                + epic.getDuration() + "," + epic.getEndTime();
+                + epic.getDuration();
     }
 
     private String toStringSubtask(SubTask subTask) {
         return subTask.getId() + "," + SUB_TASK + "," + subTask.getName() + ","
                 + subTask.getStatus() + "," + subTask.getDescription() + "," +
                 subTask.getStartTime() + "," + subTask.getDuration() + ","
-                + subTask.getEndTime() + "," + subTask.getEpicId();
+                 + subTask.getEpicId();
     }
 
     //сохранение истории в файл
@@ -104,22 +104,23 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                         switch (TaskType.valueOf(split.get(1))) {
                             case TASK:
                                 task = new Task(split.get(2), split.get(4), split.get(3), idTask,
-                                        String.valueOf(split.get(5)), Long.parseLong(split.get(6)),
-                                        String.valueOf(split.get(7)));
+                                        String.valueOf(split.get(5)), Long.parseLong(split.get(6)));
                                 tasks.put(idTask, task);
+                                priorityTasks.put(task.getStartTime(),task);
                                 break;
                             case EPIC:
                                 task = new Epic(split.get(2), split.get(4), split.get(3), idTask,
-                                        String.valueOf(split.get(5)), Long.parseLong(split.get(6)),
-                                        String.valueOf(split.get(7)));
+                                        String.valueOf(split.get(5)), Long.parseLong(split.get(6)));
                                 epics.put(idTask, (Epic) task);
+                                priorityTasks.put(task.getStartTime(),task);
                                 break;
                             case SUB_TASK:
                                 task = new SubTask(split.get(2), split.get(4), split.get(3), idTask,
                                         String.valueOf(split.get(5)), Long.parseLong(split.get(6)),
-                                        String.valueOf(split.get(7)), Integer.parseInt(split.get(8)));
+                                        Integer.parseInt(split.get(7)));
                                 subTasks.put(idTask, (SubTask) task);
-                                getSubtasksByEpicId(Integer.parseInt(split.get(8))).add(idTask);
+                                priorityTasks.put(task.getStartTime(),task);
+                                getSubtasksByEpicId(Integer.parseInt(split.get(7))).add(idTask);
                                 break;
                         }
                     } else {
@@ -164,7 +165,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
     @Override
     public void createSubTasks(SubTask subTask) {
-        ;
         super.createSubTasks(subTask);
         save();
     }
@@ -235,18 +235,22 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
     public static void main(String[] args) {
         FileBackedTasksManager fb = new FileBackedTasksManager(new File("csvSave.csv"));
-        Task task = new Task("task1", "description1", 30, 2022, 05, 14, 22, 22);
+        Task task = new Task("task1", "description1", 30, 2022, 05,
+                14, 22, 22);
         fb.createTasks(task);
         System.out.println("вызываем задачу:");
         System.out.println(fb.getAllTasks());
         //создаем эпик с 3 подзадачами
         Epic epic1 = new Epic("epic1", "описание эпик 1");
         fb.createEpics(epic1);
-        SubTask subTask1 = new SubTask("подзадача1", "описание подзадачи1", 40, 2022, 07, 12, 12, 00, epic1.getId());
+        SubTask subTask1 = new SubTask("подзадача1", "описание подзадачи1", 40,
+                2022, 07, 12, 12, 00, epic1.getId());
         fb.createSubTasks(subTask1);
-        SubTask subTask2 = new SubTask("подзадача2", "описание подзадачи", 30, 2022, 07, 12, 11, 00, epic1.getId());
+        SubTask subTask2 = new SubTask("подзадача2", "описание подзадачи", 30,
+                2022, 07, 12, 11, 00, epic1.getId());
         fb.createSubTasks(subTask2);
-        SubTask subTask3 = new SubTask("подзадача3", "описание подзадачи3", 30, 2022, 07, 12, 14, 00, epic1.getId());
+        SubTask subTask3 = new SubTask("подзадача3", "описание подзадачи3", 30,
+                2022, 07, 12, 14, 00, epic1.getId());
         fb.createSubTasks(subTask3);
         System.out.println("вызываем эпик:");
         System.out.println(fb.getAllEpics());

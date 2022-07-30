@@ -4,20 +4,15 @@ import model.Epic;
 import model.SubTask;
 import model.Task;
 
-import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public interface TaskManager {
 
-    //получение списка сортировки
-    List<Task> getPrioritizedTasks();
-
-    //   получение истории
-    List<Task> getHistory() throws IOException;
-
     //    создание задач, эпиков, подзадач
-    void createTasks(Task task) throws IOException;
+    void createTasks(Task task);
 
     void createEpics(Epic epic);
 
@@ -29,6 +24,12 @@ public interface TaskManager {
     HashMap<Integer, Epic> getAllEpics();
 
     HashMap<Integer, SubTask> getAllSubTasks();
+
+    //получение списка сортировки
+    Map<LocalDateTime, Task> getPrioritizedTasks();
+
+    //   получение истории
+    List<Task> getHistory();
 
     //    получение задач, эпиков, подзадач по идентификатору
     Task getTaskById(int id);

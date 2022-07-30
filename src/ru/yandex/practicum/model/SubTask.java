@@ -8,8 +8,8 @@ public class SubTask extends Task {
     private int epicId;
 
     public SubTask(String name, String description, String status, int id, String startTime,
-                   long duration, String endTime, int epicId) {
-        super(name, description, status, id, startTime, duration, endTime);
+                   long duration, int epicId) {
+        super(name, description, status, id, startTime, duration);
         this.epicId = epicId;
     }
 
@@ -22,10 +22,6 @@ public class SubTask extends Task {
     public SubTask(String name, String description, int epicId) {
         super(name, description, String.valueOf(Status.NEW));
         this.epicId = epicId;
-    }
-
-    public SubTask(String name, String description) {
-        super(name, description, String.valueOf(Status.NEW));
     }
 
     public int getEpicId() {

@@ -13,8 +13,6 @@ public class Task implements Comparable<Task> {
     private int id;
     private LocalDateTime startTime;
     private long duration;
-    private LocalDateTime endTime;
-
 
     public Task(String name, String description, long duration, int year,
                 int month, int day, int hours, int minutes) {
@@ -23,7 +21,6 @@ public class Task implements Comparable<Task> {
         this.duration = duration;
         this.status = Status.NEW;
         this.startTime = LocalDateTime.of(year,month, day, hours, minutes);
-        this.endTime = getEndTime();
     }
 
     public Task(String name, String description, String status) {
@@ -32,7 +29,6 @@ public class Task implements Comparable<Task> {
         this.status = Status.valueOf(status);
         this.startTime = LocalDateTime.MAX;
         this.duration = 0;
-        this.endTime = LocalDateTime.MIN;
     }
 
     public Task(String name, String description, String status, int id) {
@@ -43,14 +39,13 @@ public class Task implements Comparable<Task> {
     }
 
     public Task(String name, String description, String status,
-                int id, String startTime, long duration, String endTime) {
+                int id, String startTime, long duration) {
         this.name = name;
         this.description = description;
         this.status = Status.valueOf(status);
         this.id = id;
         this.startTime = LocalDateTime.parse(startTime);
         this.duration = duration;
-        this.endTime = LocalDateTime.parse(endTime);
     }
 
     @Override
@@ -58,13 +53,10 @@ public class Task implements Comparable<Task> {
         return this.startTime.compareTo(other.startTime);
     }
 
-    public void setEndTime(LocalDateTime endTime) {
-        this.endTime = endTime;
-    }
 
     public LocalDateTime getEndTime(){
         Duration durationTask = Duration.ofMinutes(duration);
-        endTime = startTime.plus(durationTask);
+        LocalDateTime endTime = startTime.plus(durationTask);
         return endTime;
     }
 
@@ -139,7 +131,6 @@ public class Task implements Comparable<Task> {
                 ", id=" + id +
                 ", startTime=" + startTime +
                 ", duration=" + duration +
-                ", endTime=" + endTime +
                 '}';
     }
 

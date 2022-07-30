@@ -8,9 +8,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class InMemoryHistoryManagerTest {
 
-    //обновление пустой истории
+    //1.обновление пустой истории
     @Test
-    void UpdatingAnEmptyTaskHistory() {
+    void Test1_UpdatingAnEmptyTaskHistory() {
         InMemoryHistoryManager inMemoryHistoryManager = new InMemoryHistoryManager();
         InMemoryTaskManager inMemoryTaskManager = new InMemoryTaskManager();
         Task task1 = new Task("task1", "описание задачи",
@@ -21,9 +21,9 @@ class InMemoryHistoryManagerTest {
         assertEquals(0, inMemoryHistoryManager.getHistory().size());
     }
 
-    //обновление  истории с дублем
+    //2.обновление  истории с дублем
     @Test
-    void UpdatingTheHistoryOfTasksWithDuplicates() {
+    void Test2_UpdatingTheHistoryOfTasksWithDuplicates() {
         InMemoryHistoryManager inMemoryHistoryManager = new InMemoryHistoryManager();
         InMemoryTaskManager inMemoryTaskManager = new InMemoryTaskManager();
         Task task1 = new Task("task1", "описание задачи",
@@ -34,9 +34,9 @@ class InMemoryHistoryManagerTest {
         assertEquals(1, inMemoryHistoryManager.getHistory().size());
     }
 
-    //обновление истории с 2 задачами
+    //3.обновление истории с 2 задачами
     @Test
-    void UpdatingTheHistoryWithTwoTasks() {
+    void Test3_UpdatingTheHistoryWithTwoTasks() {
         InMemoryHistoryManager inMemoryHistoryManager = new InMemoryHistoryManager();
         InMemoryTaskManager inMemoryTaskManager = new InMemoryTaskManager();
         Task task1 = new Task("task1", "описание задачи",
@@ -48,5 +48,4 @@ class InMemoryHistoryManagerTest {
         inMemoryHistoryManager.add(epic1);
         assertEquals(2, inMemoryHistoryManager.getHistory().size());
     }
-
 }
