@@ -31,7 +31,12 @@ public class InMemoryTaskManager implements TaskManager {
     //получение истории
     @Override
     public List<Task> getHistory() {
-        return historyManager.getHistory();
+        List<Task> history = historyManager.getHistory();
+        for (Task i : history) {
+            if (epics.containsKey(i.getId()))
+                refreshDateTimeEpic(i.getId());
+        }
+        return history;
     }
 
     //проверка пересечений
@@ -59,8 +64,8 @@ public class InMemoryTaskManager implements TaskManager {
     public void createTasks(Task task) {
         task.setId(id);
         id++;
-        priorityTasks.put(task.getStartTime(), task);
         checkingForIntersectionsOfTasks(task);
+        priorityTasks.put(task.getStartTime(), task);
         tasks.put(task.getId(), task);
     }
 
@@ -75,8 +80,8 @@ public class InMemoryTaskManager implements TaskManager {
     public void createSubTasks(SubTask subTask) {
         subTask.setId(id);
         id++;
-        priorityTasks.put(subTask.getStartTime(), subTask);
         checkingForIntersectionsOfTasks(subTask);
+        priorityTasks.put(subTask.getStartTime(), subTask);
         if (epics.containsKey(subTask.getEpicId())) {
             subTasks.put(subTask.getId(), subTask);
             startTimeEpic(subTask.getEpicId());
@@ -150,15 +155,10 @@ public class InMemoryTaskManager implements TaskManager {
     //    обновление задач, эпиков, подзадач
     @Override
     public void refreshTasks(Task task) {
-        TreeSet<LocalDateTime> delete = new TreeSet<>();
-        for (Task i : priorityTasks.values()) {
-            if (i.getId() == task.getId()) {
-                delete.add(i.getStartTime());
-            }
-        }
-        priorityTasks.remove(delete.first());
-        if (tasks.containsKey(task.getId())) {
+        Task delete = tasks.get(task.getId());
+        if (delete != null) {
             checkingForIntersectionsOfTasks(task);
+            priorityTasks.remove(delete.getStartTime());
             tasks.put(task.getId(), task);
             priorityTasks.put(task.getStartTime(), task);
         }
@@ -173,15 +173,10 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void refreshSubTasks(SubTask subTask) {
-        TreeSet<LocalDateTime> delete = new TreeSet<>();
-        if (subTasks.containsKey(subTask.getId())) {
-            for (Task i : priorityTasks.values()) {
-                if (i.getId() == subTask.getId()) {
-                    delete.add(i.getStartTime());
-                }
-            }
-            priorityTasks.remove(delete.first());
+        SubTask delete = subTasks.get(subTask.getId());
+        if (delete != null) {
             checkingForIntersectionsOfTasks(subTask);
+            priorityTasks.remove(delete.getStartTime());
             subTasks.put(subTask.getId(), subTask);
             priorityTasks.put(subTask.getStartTime(), subTask);
             refreshStatusEpic(subTask.getEpicId());
@@ -336,12 +331,12 @@ public class InMemoryTaskManager implements TaskManager {
     public void removeEpicById(int id) {
         if (getSubtasksByEpicId(id) != null) {
             for (Integer del : getSubtasksByEpicId(id)) {
-                subTasks.remove(del);
                 priorityTasks.remove(subTasks.get(del).getStartTime());
                 historyManager.remove(del);
+                subTasks.remove(del);
             }
-            epics.remove(id);
             historyManager.remove(id);
+            epics.remove(id);
         }
     }
 
@@ -355,8 +350,8 @@ public class InMemoryTaskManager implements TaskManager {
                 endTimeEpic(subTasks.get(id).getEpicId());
                 refreshStatusEpic(subTasks.get(id).getEpicId());
                 priorityTasks.remove(subTasks.get(id).getStartTime());
-                subTasks.remove(id);
                 historyManager.remove(id);
+                subTasks.remove(id);
             }
         }
     }

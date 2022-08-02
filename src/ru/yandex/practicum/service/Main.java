@@ -37,5 +37,7 @@ public class Main {
         manager.getSubTaskById(5);
         manager.getSubTaskById(4);
         System.out.println(manager.getHistory());
+        //manager.removeEpicById(3);
+        manager.removeSubTaskById(6);
     }
 }
