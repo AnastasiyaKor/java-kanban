@@ -1,6 +1,8 @@
 package service;
 
-import model.*;
+import model.Epic;
+import model.SubTask;
+import model.Task;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -10,16 +12,16 @@ import static service.TaskType.*;
 
 public class FileBackedTasksManager extends InMemoryTaskManager {
 
-    private final File scvSave;
+    private final File file;
     private static final String FILE_HEADER = "id,type,name,status,description,startTime,duration,epic";
 
-    public FileBackedTasksManager(File scvSave) {
-        this.scvSave = scvSave;
+    public FileBackedTasksManager(File file) {
+        this.file = file;
     }
 
     // сохранение в файл
     private void save() {
-        try (FileWriter fileWriter = new FileWriter(scvSave)) {
+        try (FileWriter fileWriter = new FileWriter(file)) {
             fileWriter.write(FILE_HEADER);
             fileWriter.write("\n");
             for (Task task : tasks.values()) {
@@ -58,7 +60,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         return subTask.getId() + "," + SUB_TASK + "," + subTask.getName() + ","
                 + subTask.getStatus() + "," + subTask.getDescription() + "," +
                 subTask.getStartTime() + "," + subTask.getDuration() + ","
-                 + subTask.getEpicId();
+                + subTask.getEpicId();
     }
 
     //сохранение истории в файл
@@ -106,20 +108,21 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                                 task = new Task(split.get(2), split.get(4), split.get(3), idTask,
                                         String.valueOf(split.get(5)), Long.parseLong(split.get(6)));
                                 tasks.put(idTask, task);
-                                priorityTasks.put(task.getStartTime(),task);
+                                priorityTasks.put(task.getStartTime(), task);
                                 break;
                             case EPIC:
                                 task = new Epic(split.get(2), split.get(4), split.get(3), idTask,
                                         String.valueOf(split.get(5)), Long.parseLong(split.get(6)));
                                 epics.put(idTask, (Epic) task);
-                                priorityTasks.put(task.getStartTime(),task);
+                                priorityTasks.put(task.getStartTime(), task);
                                 break;
                             case SUB_TASK:
                                 task = new SubTask(split.get(2), split.get(4), split.get(3), idTask,
                                         String.valueOf(split.get(5)), Long.parseLong(split.get(6)),
                                         Integer.parseInt(split.get(7)));
                                 subTasks.put(idTask, (SubTask) task);
-                                priorityTasks.put(task.getStartTime(),task);
+                                priorityTasks.put(task.getStartTime(), task);
+                                refreshDateTimeEpic(subTasks.get(id).getEpicId());
                                 getSubtasksByEpicId(Integer.parseInt(split.get(7))).add(idTask);
                                 break;
                         }
@@ -132,10 +135,10 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                             } else if (epics.containsKey(i)) {
                                 historyManager.add(epics.get(i));
                             } else {
+                                refreshDateTimeEpic(subTasks.get(id).getEpicId());
                                 historyManager.add(subTasks.get(i));
                             }
                         }
-                        System.out.println(historyManager.getHistory()); //для наглядности
                     }
                 }
             } catch (IOException e) {
@@ -234,7 +237,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
 
     public static void main(String[] args) {
-        FileBackedTasksManager fb = new FileBackedTasksManager(new File("csvSave.csv"));
+        FileBackedTasksManager fb = Managers.getDefaultFileBacked();
         Task task = new Task("task1", "description1", 30, 2022, 05,
                 14, 22, 22);
         fb.createTasks(task);
@@ -267,8 +270,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         System.out.println("Смотрим историю:");
         System.out.println(fb.getHistory());//смотрим историю
         System.out.println("Восстановление из файла:");
-        FileBackedTasksManager fileBackedTasksManager = loadFromFile(new File("csvSave.csv"));
-        System.out.println(fileBackedTasksManager);
         System.out.println(fb.getPrioritizedTasks());
     }
 }

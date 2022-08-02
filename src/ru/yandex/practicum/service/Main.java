@@ -2,9 +2,11 @@ package service;
 
 import model.*;
 
+import java.io.IOException;
+
 public class Main {
 
-    public static void main(String[] args){
+    public static void main(String[] args) throws IOException {
         TaskManager manager = Managers.getDefault();
         Task task = new Task("task1", "description1", 30, 2022,
                 05, 14, 20, 00);
@@ -15,8 +17,6 @@ public class Main {
         manager.createTasks(task);
         manager.createTasks(task2);
         manager.createTasks(task3);
-        System.out.println("вызываем задачу:");
-        System.out.println(manager.getAllTasks());
         //создаем эпик с 3 подзадачами
         Epic epic1 = new Epic("epic1", "описание эпик 1");
         manager.createEpics(epic1);
@@ -29,20 +29,13 @@ public class Main {
         SubTask subTask3 = new SubTask("подзадача3", "описание подзадачи3", 30, 2022,
                 07, 12, 11, 00, epic1.getId());
         manager.createSubTasks(subTask3);
-        System.out.println("вызываем эпик:");
-        System.out.println(manager.getAllEpics());
-        System.out.println("вызываем подзадачи:");
-        System.out.println(manager.getAllSubTasks());
-        System.out.println("вызываем сортировку задач");
-        System.out.println(manager.getPrioritizedTasks());
-        System.out.println("задачи приоритета");
-        System.out.println(manager.getPrioritizedTasks());
-       manager.removeSubTaskById(4);
-        System.out.println("вызываем подзадачи после удаления:");
-        System.out.println(manager.getAllSubTasks());
-        System.out.println("задачи приоритета после удаления");
-        System.out.println(manager.getPrioritizedTasks());
-        System.out.println("эпики");
-        manager.getAllEpics();
+        manager.getTaskById(2);
+        manager.getTaskById(1);
+        manager.getTaskById(0);
+        manager.getEpicById(3);
+        manager.getSubTaskById(6);
+        manager.getSubTaskById(5);
+        manager.getSubTaskById(4);
+        System.out.println(manager.getHistory());
     }
 }

@@ -4,6 +4,7 @@ import model.Epic;
 import model.SubTask;
 import model.Task;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +17,7 @@ public interface TaskManager {
 
     void createEpics(Epic epic);
 
-    void createSubTasks(SubTask subTask);
+    void createSubTasks(SubTask subTask) throws IOException;
 
     //    получение списка задач, эпиков, подзадач
     HashMap<Integer, Task> getAllTasks();
@@ -58,4 +59,6 @@ public interface TaskManager {
     void removeEpicById(int id);
 
     void removeSubTaskById(int id);
+
+    void refreshStatusEpic(int id);
 }

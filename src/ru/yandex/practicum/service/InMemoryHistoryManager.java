@@ -79,21 +79,6 @@ class InMemoryHistoryManager implements HistoryManager {
         return true;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        InMemoryHistoryManager that = (InMemoryHistoryManager) o;
-        return size == that.size && Objects.equals(customLinkedList, that.customLinkedList) &&
-                Objects.equals(head, that.head) && Objects.equals(tail, that.tail);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(customLinkedList, head, tail, size);
-    }
-
-
     private static class Node<Task> {
 
         public Node<Task> prev;

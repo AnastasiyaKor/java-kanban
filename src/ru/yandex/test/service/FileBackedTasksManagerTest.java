@@ -7,16 +7,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static service.FileBackedTasksManager.loadFromFile;
 
 class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager> {
     FileBackedTasksManager fileBackedTasksManager;
-    File file = new File("csvSave");
+    File file = new File("csvSave.csv");
 
+    @Override
     @BeforeEach
-    protected void beforeEach() {
-        inMemoryTaskManager = new InMemoryTaskManager();
+    void beforeEach() {
         fileBackedTasksManager = new FileBackedTasksManager(file);
     }
 
@@ -28,7 +30,7 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
 
     //2.1проверка восстановления данных эпика из файла
     @Test
-    void Test2_1_CheckingTheRecoveryOfAnEpicFromAFile() {
+    void Test2_1_CheckingTheRecoveryOfAnEpicFromAFile(){
         Epic epic1 = new Epic("епик1", "описание эпика 1");
         fileBackedTasksManager.createEpics(epic1);
         SubTask subTask1 = new SubTask("подзадача1", "описание подзадачи1", 40, 2022,
@@ -39,25 +41,23 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
 
     //3.1.проверка идентичности данных эпиков из с файла и памяти
     @Test
-    void Test3_1__IdentityOfEpicDataFromFileAndMemory() {
+    void Test3_1__IdentityOfEpicDataFromFileAndMemory() throws IOException{
         InMemoryTaskManager taskManager = new InMemoryTaskManager();
         Epic epic1 = new Epic("епик1", "описание эпика 1");
+        Epic epic2 = new Epic("епик2", "описание эпика 2");
+        SubTask subTask1 = new SubTask("подзадача1 эпика 1", "описание подзадачи1", 40,
+                2022, 04, 12, 12, 00, epic1.getId());
+        SubTask subTask2 = new SubTask("подзадача1 эпика2", "описание подзадачи1", 60,
+                2022, 04, 28, 12, 00, epic2.getId());
+        fileBackedTasksManager.createSubTasks(subTask1);
+        taskManager.createSubTasks(subTask1);
         fileBackedTasksManager.createEpics(epic1);
         taskManager.createEpics(epic1);
-        Epic epic2 = new Epic("епик2", "описание эпика 2");
-        fileBackedTasksManager.createEpics(epic2);
-        taskManager.createEpics(epic2);
-        SubTask subTask1 = new SubTask("подзадача1", "описание подзадачи1", 40, 2022,
-                04, 12, 12, 00, epic1.getId());
-        fileBackedTasksManager.createSubTasks(subTask1);
-        taskManager.createSubTasks(subTask1);
-        SubTask subTask2 = new SubTask("подзадача1", "описание подзадачи1", 60, 2022,
-                04, 28, 12, 00, epic2.getId());
-        fileBackedTasksManager.createSubTasks(subTask1);
-        taskManager.createSubTasks(subTask1);
         fileBackedTasksManager.createSubTasks(subTask2);
         taskManager.createSubTasks(subTask2);
-        assertEquals(taskManager.getAllEpics(), fileBackedTasksManager.getAllEpics(),
+        fileBackedTasksManager.createEpics(epic2);
+        taskManager.createEpics(epic2);
+        assertEquals(taskManager.getAllEpics(),  loadFromFile(file).getAllEpics(),
                 "Список эпиков после выгрузки не совпададает");
     }
 
@@ -73,13 +73,13 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
         taskManager.createTasks(task);
         fileBackedTasksManager.createTasks(task2);
         taskManager.createTasks(task2);
-        assertEquals(taskManager.getAllTasks(), fileBackedTasksManager.getAllTasks(),
+        assertEquals(taskManager.getAllTasks(), loadFromFile(file).getAllTasks(),
                 "Список задач после выгрузки не совпададает");
     }
 
     //5.1.проверка идентичности данных подзадач из с файла и памяти
     @Test
-    void Test5_1_IdentityOfSubTaskDataFromFileAndMemory() {
+    void Test5_1_IdentityOfSubTaskDataFromFileAndMemory() throws IOException{
         InMemoryTaskManager taskManager = new InMemoryTaskManager();
         Epic epic1 = new Epic("епик1", "описание эпика 1");
         fileBackedTasksManager.createEpics(epic1);
@@ -96,34 +96,38 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
         taskManager.createSubTasks(subTask2);
         fileBackedTasksManager.createSubTasks(subTask3);
         taskManager.createSubTasks(subTask3);
-        assertEquals(taskManager.getAllSubTasks(), fileBackedTasksManager.getAllSubTasks(),
+        assertEquals(taskManager.getAllSubTasks(), loadFromFile(file).getAllSubTasks(),
                 "Список подзадач после выгрузки не совпададает");
     }
 
     //6.1.проверка восстановления пустой истории из файла
     @Test
     void Test6_1_CheckingTheRecoveryOfAnEmptyHistoryFromAFile() {
-        assertEquals(0, fileBackedTasksManager.getHistory().size());
+        assertEquals(0, loadFromFile(file).getHistory().size());
     }
 
     //7.1.проверка восстановления истории из файла
     @Test
-    void Test7_1_CheckingTheHistoryRecoveryFromAFilledFile() {
+    void Test7_1_CheckingTheHistoryRecoveryFromAFilledFile(){
+        InMemoryTaskManager inMemoryTaskManager = new InMemoryTaskManager();
         Task task = new Task("задача1", "описание задачи 1",
                 40, 2022, 12, 12, 20, 00);
-        fileBackedTasksManager.createTasks(task);
         Epic epic1 = new Epic("епик1", "описание эпика 1");
-        fileBackedTasksManager.createEpics(epic1);
         SubTask subTask1 = new SubTask("подзадача1", "описание подзадачи1", 40, 2022,
-                04, 12, 12, 00, epic1.getId());
+                04, 12, 12, 00, 1);
+        fileBackedTasksManager.createTasks(task);
+        inMemoryTaskManager.createTasks(task);
+        fileBackedTasksManager.createEpics(epic1);
+        inMemoryTaskManager.createEpics(epic1);
         fileBackedTasksManager.createSubTasks(subTask1);
-        SubTask subTask2 = new SubTask("подзадача2", "описание подзадачи", 30, 2022,
-                07, 12, 13, 00, epic1.getId());
-        fileBackedTasksManager.createSubTasks(subTask2);
-        fileBackedTasksManager.getSubTaskById(3);
-        fileBackedTasksManager.getSubTaskById(2);
+        inMemoryTaskManager.createSubTasks(subTask1);
         fileBackedTasksManager.getEpicById(1);
+        fileBackedTasksManager.getSubTaskById(2);
         fileBackedTasksManager.getTaskById(0);
-        assertEquals(4, fileBackedTasksManager.getHistory().size());
+
+        inMemoryTaskManager.getEpicById(1);
+        inMemoryTaskManager.getSubTaskById(2);
+        inMemoryTaskManager.getTaskById(0);
+        assertEquals(inMemoryTaskManager.getHistory(), loadFromFile(file).getHistory());
     }
 }
