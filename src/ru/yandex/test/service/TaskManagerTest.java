@@ -33,11 +33,9 @@ abstract class TaskManagerTest<T extends TaskManager> {
         Epic epic1 = new Epic("Эпик 1", "описание эпика 1");
         inMemoryTaskManager.createEpics(epic1);
         inMemoryTaskManager.createSubTasks(new SubTask("подзадача1",
-                "описание подзадачи1", 40, 2022,
-                04, 12, 12, 00, epic1.getId()));
+                "описание подзадачи1", 30, "2022-08-15T21:00:00", epic1.getId()));
         inMemoryTaskManager.createSubTasks(new SubTask("подзадача2",
-                "описание подзадачи", 30, 2022,
-                07, 12, 13, 00, epic1.getId()));
+                "описание подзадачи", 30, "2022-12-15T21:00:00", epic1.getId()));
         assertEquals(NEW, epic1.getStatus(), "ожидается статус NEW");
     }
 
@@ -46,12 +44,12 @@ abstract class TaskManagerTest<T extends TaskManager> {
     void Test3_CalculationOfTheEpicStatusAllTasksWithTheStatusDone() throws IOException {
         Epic epic1 = new Epic("Эпик 1", "описание эпика 1");
         inMemoryTaskManager.createEpics(epic1);
-        SubTask subTask1 = new SubTask("подзадача1", "описание подзадачи1", 40, 2022,
-                04, 12, 12, 00, epic1.getId());
+        SubTask subTask1 = new SubTask("подзадача1", "описание подзадачи1", 30,
+                "2023-01-15T21:00:00", epic1.getId());
         subTask1.setStatus(DONE);
         inMemoryTaskManager.refreshSubTasks(subTask1);
-        SubTask subTask2 = new SubTask("подзадача2", "описание подзадачи", 30, 2022,
-                07, 12, 13, 00, epic1.getId());
+        SubTask subTask2 = new SubTask("подзадача2", "описание подзадачи", 30,
+                "2022-11-10T21:00:00", epic1.getId());
         inMemoryTaskManager.createSubTasks(subTask2);
         subTask2.setStatus(DONE);
         inMemoryTaskManager.refreshSubTasks(subTask2);
@@ -64,13 +62,13 @@ abstract class TaskManagerTest<T extends TaskManager> {
     void Test4_CalculationOfTheEpicStatusSubtasksWithNewAndDoneStatuses() throws IOException {
         Epic epic1 = new Epic("Эпик 1", "описание эпика 1");
         inMemoryTaskManager.createEpics(epic1);
-        SubTask subTask1 = new SubTask("подзадача1", "описание подзадачи1", 40, 2022,
-                04, 12, 12, 00, epic1.getId());
+        SubTask subTask1 = new SubTask("подзадача1", "описание подзадачи1", 30,
+                "2022-10-25T21:00:00", epic1.getId());
         inMemoryTaskManager.createSubTasks(subTask1);
         subTask1.setStatus(NEW);
         inMemoryTaskManager.refreshSubTasks(subTask1);
-        SubTask subTask2 = new SubTask("подзадача2", "описание подзадачи", 30, 2022,
-                07, 12, 13, 00, epic1.getId());
+        SubTask subTask2 = new SubTask("подзадача2", "описание подзадачи", 30,
+                "2022-10-26T21:00:00", epic1.getId());
         inMemoryTaskManager.createSubTasks(subTask2);
         subTask2.setStatus(DONE);
         inMemoryTaskManager.refreshSubTasks(subTask2);
@@ -80,16 +78,16 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     //5.расчет статуса эпика. Подзадачи со статусами IN_PROGRESS
     @Test
-    void Test5_CalculationOfTheEpicStatusSubtasksWithIn_ProgressStatuses()  throws IOException{
+    void Test5_CalculationOfTheEpicStatusSubtasksWithIn_ProgressStatuses() throws IOException {
         Epic epic1 = new Epic("Эпик 1", "описание эпика 1");
         inMemoryTaskManager.createEpics(epic1);
-        SubTask subTask1 = new SubTask("подзадача1", "описание подзадачи1", 40, 2022,
-                04, 12, 12, 00, epic1.getId());
+        SubTask subTask1 = new SubTask("подзадача1", "описание подзадачи1", 30,
+                "2022-10-17T21:00:00", epic1.getId());
         inMemoryTaskManager.createSubTasks(subTask1);
         subTask1.setStatus(IN_PROGRESS);
         inMemoryTaskManager.refreshSubTasks(subTask1);
-        SubTask subTask2 = new SubTask("подзадача2", "описание подзадачи", 30, 2022,
-                07, 12, 13, 00, epic1.getId());
+        SubTask subTask2 = new SubTask("подзадача2", "описание подзадачи", 30,
+                "2022-10-28T21:00:00", epic1.getId());
         inMemoryTaskManager.createSubTasks(subTask2);
         subTask2.setStatus(IN_PROGRESS);
         inMemoryTaskManager.refreshSubTasks(subTask2);
@@ -99,14 +97,14 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     //6. Проверка наличия эпика для подзадачи
     @Test
-    void Test6_CheckingForThePresenceOfAnEpicInASubtask()  throws IOException{
+    void Test6_CheckingForThePresenceOfAnEpicInASubtask() throws IOException {
         Epic epic1 = new Epic("Эпик 1", "описание эпика 1");
         inMemoryTaskManager.createEpics(epic1);
-        SubTask subTask1 = new SubTask("подзадача1", "описание подзадачи1", 40, 2022,
-                04, 12, 12, 00, epic1.getId());
+        SubTask subTask1 = new SubTask("подзадача1", "описание подзадачи1", 30,
+                "2022-10-05T21:00:00", epic1.getId());
         inMemoryTaskManager.createSubTasks(subTask1);
-        SubTask subTask2 = new SubTask("подзадача2", "описание подзадачи", 30, 2022,
-                07, 12, 13, 00, epic1.getId());
+        SubTask subTask2 = new SubTask("подзадача2", "описание подзадачи", 30,
+                "2022-10-06T21:00:00", epic1.getId());
         inMemoryTaskManager.createSubTasks(subTask2);
         assertEquals(epic1.getId(), subTask1.getEpicId());
     }
@@ -114,10 +112,9 @@ abstract class TaskManagerTest<T extends TaskManager> {
     //7. Проверка записи задачи в мапу (метод createTasks)
     @Test
     void Test7_CreatingAndWritingATaskToTheMap() {
-        inMemoryTaskManager.createTasks(new Task("Задача 1", "описание задачи 1",
-                10, 2022, 07, 07, 20, 20));
+        inMemoryTaskManager.createTasks(new Task("Задача 1", "описание задачи 1", 30,
+                "2022-02-15T21:00:00"));
         assertEquals(1, inMemoryTaskManager.getAllTasks().size());
-        //assertEquals(1, inMemoryTaskManager.tasks.size());
     }
 
     //8. Проверка записи эпика в мапу (метод  createEpics)
@@ -125,50 +122,45 @@ abstract class TaskManagerTest<T extends TaskManager> {
     void Test8_CreatingAndWritingAEpicToTheMap() {
         inMemoryTaskManager.createEpics(new Epic("Эпик 1", "описание эпика 1"));
         assertEquals(1, inMemoryTaskManager.getAllEpics().size());
-       // assertEquals(1, inMemoryTaskManager.epics.size());
     }
 
     //9. Проверка записи подзадачи в мапу (метод createSubTasks)
     @Test
-    void Test9_CreatingAndWritingASubTaskToTheMap() throws IOException{
+    void Test9_CreatingAndWritingASubTaskToTheMap() throws IOException {
         Epic epic1 = new Epic("Эпик 1", "описание эпика 1");
         inMemoryTaskManager.createEpics(epic1);
         inMemoryTaskManager.createSubTasks(new SubTask("подзадача1",
-                "описание подзадачи1", 40, 2022,
-                04, 12, 12, 00, epic1.getId()));
+                "описание подзадачи1", 30, "2022-10-11T21:00:00", epic1.getId()));
         assertEquals(1, inMemoryTaskManager.getAllSubTasks().size());
-       // assertEquals(1, inMemoryTaskManager.subTasks.size());
     }
 
     //10.получение пустого списка сортировки (метод getPrioritizedTasks)
     @Test
     void Test10_checkingToGetAnEmptyPrioritySortingList() {
         inMemoryTaskManager.getPrioritizedTasks();
-        assertEquals(0,inMemoryTaskManager.getPrioritizedTasks().size());
-        //assertEquals(0,inMemoryTaskManager.priorityTasks.size());
+        assertEquals(0, inMemoryTaskManager.getPrioritizedTasks().size());
     }
 
     //11.получение непустого списка сортировки (метод getPrioritizedTasks)
     @Test
-    void Test11_checkingForGettingAPrioritySortingList() throws IOException{
-        Task task1 = new Task("Задача 1", "описание задачи 1",
-                10, 2022, 07, 15, 20, 21);
+    void Test11_checkingForGettingAPrioritySortingList() throws IOException {
+        Task task1 = new Task("Задача 1", "описание задачи 1", 30,
+                "2022-10-15T11:00:00");
         inMemoryTaskManager.createTasks(task1);
         Epic epic1 = new Epic("Эпик 1", "описание эпика 1");
         inMemoryTaskManager.createEpics(epic1);
-        SubTask subTask1 = new SubTask("подзадача1", "описание подзадачи1", 40, 2022,
-                04, 12, 12, 00, epic1.getId());
+        SubTask subTask1 = new SubTask("подзадача1", "описание подзадачи1", 30,
+                "2022-10-10T21:00:00", epic1.getId());
         inMemoryTaskManager.createSubTasks(subTask1);
         inMemoryTaskManager.getPrioritizedTasks();
-        assertEquals(2,inMemoryTaskManager.getPrioritizedTasks().size());
-        //assertEquals(2,inMemoryTaskManager.priorityTasks.size());
+        assertEquals(2, inMemoryTaskManager.getPrioritizedTasks().size());
     }
 
     //12. Проверка получения задачи по идентификатору (метод getTaskById)
     @Test
     void Test12_GettingATaskById() {
-        Task task1 = new Task("Задача 1", "описание задачи 1",
-                10, 2022, 07, 15, 20, 21);
+        Task task1 = new Task("Задача 1", "описание задачи 1", 30,
+                "2022-10-15T15:00:00");
         inMemoryTaskManager.createTasks(task1);
         assertEquals(0, task1.getId());
     }
@@ -176,8 +168,8 @@ abstract class TaskManagerTest<T extends TaskManager> {
     //12.1 Проверка получения задачи по неверному идентификатору (метод getTaskById)
     @Test
     void Test12_1_GettingATaskByAnErroneousId() {
-        Task task1 = new Task("Задача 1", "описание задачи 1",
-                10, 2022, 07, 01, 20, 21);
+        Task task1 = new Task("Задача 1", "описание задачи 1", 30,
+                "2022-10-15T06:00:00");
         inMemoryTaskManager.createTasks(task1);
         Task taskId = inMemoryTaskManager.getTaskById(1);
         //Task taskId = inMemoryTaskManager.tasks.get(1);
@@ -203,22 +195,22 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     //14. Проверка получения подзадачи по идентификатору (метод getSubTaskById)
     @Test
-    void Test14_GettingASubTaskById() throws IOException{
+    void Test14_GettingASubTaskById() throws IOException {
         Epic epic1 = new Epic("Эпик 1", "описание эпика 1");
         inMemoryTaskManager.createEpics(epic1);
-        SubTask subTask1 = new SubTask("подзадача1", "описание подзадачи1", 40, 2022,
-                04, 12, 12, 00, epic1.getId());
+        SubTask subTask1 = new SubTask("подзадача1", "описание подзадачи1", 30,
+                "2022-10-18T19:00:00", epic1.getId());
         inMemoryTaskManager.createSubTasks(subTask1);
         assertEquals(1, subTask1.getId());
     }
 
     //14.1 Проверка получения подзадачи по неверному идентификатору (метод getSubTaskById)
     @Test
-    void Test14_1_GettingASubTaskByAnErroneousId() throws IOException{
+    void Test14_1_GettingASubTaskByAnErroneousId() throws IOException {
         Epic epic1 = new Epic("Эпик 1", "описание эпика 1");
         inMemoryTaskManager.createEpics(epic1);
-        SubTask subTask1 = new SubTask("подзадача1", "описание подзадачи1", 40, 2022,
-                04, 12, 12, 00, epic1.getId());
+        SubTask subTask1 = new SubTask("подзадача1", "описание подзадачи1", 30,
+                "2022-12-12T21:00:00", epic1.getId());
         inMemoryTaskManager.createSubTasks(subTask1);
         SubTask subTaskId = inMemoryTaskManager.getSubTaskById(5);
         Assertions.assertNull(subTaskId);
@@ -227,8 +219,8 @@ abstract class TaskManagerTest<T extends TaskManager> {
     //15 Проверка изменения статуса задачи (метод refreshTasks)
     @Test
     void Test15_CheckingTaskStatusChanges() {
-        Task task1 = new Task("Задача 1", "описание задачи 1",
-                10, 2022, 04, 04, 10, 00);
+        Task task1 = new Task("Задача 1", "описание задачи 1", 30,
+                "2022-10-04T12:00:00");
         inMemoryTaskManager.createTasks(task1);
         task1.setStatus(DONE);
         inMemoryTaskManager.refreshTasks(task1);
@@ -237,11 +229,11 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     //16 Проверка изменения статуса подзадачи (метод refreshSubTasks)
     @Test
-    void Test16_CheckingSubTaskStatusChanges() throws IOException{
+    void Test16_CheckingSubTaskStatusChanges() throws IOException {
         Epic epic1 = new Epic("Эпик 1", "описание эпика 1");
         inMemoryTaskManager.createEpics(epic1);
-        SubTask subTask1 = new SubTask("подзадача1", "описание подзадачи1", 40, 2022,
-                04, 12, 12, 00, epic1.getId());
+        SubTask subTask1 = new SubTask("подзадача1", "описание подзадачи1", 30,
+                "2023-01-01T10:00:00", epic1.getId());
         inMemoryTaskManager.createSubTasks(subTask1);
         subTask1.setStatus(IN_PROGRESS);
         inMemoryTaskManager.refreshSubTasks(subTask1);
@@ -251,10 +243,10 @@ abstract class TaskManagerTest<T extends TaskManager> {
     //17 Проверка удаления задач (метод clearTasks)
     @Test
     void Test17_CheckingTaskDeletion() {
-        Task task1 = new Task("Задача 1", "описание задачи 1",
-                10, 2022, 05, 05, 12, 00);
-        Task task2 = new Task("Задача 2", "описание задачи 2",
-                10, 2022, 06, 06, 13, 30);
+        Task task1 = new Task("Задача 1", "описание задачи 1", 30,
+                "2023-01-02T10:00:00");
+        Task task2 = new Task("Задача 2", "описание задачи 2", 30,
+                "2023-01-03T11:00:00");
         inMemoryTaskManager.createTasks(task1);
         inMemoryTaskManager.createTasks(task2);
         inMemoryTaskManager.clearTasks();
@@ -274,13 +266,13 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     //19 Проверка удаления подзадач (метод clearSubTask)
     @Test
-    void Test19_CheckingSubTaskDeletion() throws IOException{
+    void Test19_CheckingSubTaskDeletion() throws IOException {
         Epic epic1 = new Epic("Эпик 1", "описание эпика 1");
         inMemoryTaskManager.createEpics(epic1);
-        SubTask subTask1 = new SubTask("подзадача1", "описание подзадачи1", 40, 2022,
-                04, 12, 12, 00, epic1.getId());
-        SubTask subTask2 = new SubTask("подзадача2", "описание подзадачи", 30, 2022,
-                07, 12, 13, 00, epic1.getId());
+        SubTask subTask1 = new SubTask("подзадача1", "описание подзадачи1", 30,
+                "2023-01-04T21:00:00", epic1.getId());
+        SubTask subTask2 = new SubTask("подзадача2", "описание подзадачи", 30,
+                "2022-01-05T21:00:00", epic1.getId());
         inMemoryTaskManager.createSubTasks(subTask1);
         inMemoryTaskManager.createSubTasks(subTask2);
         inMemoryTaskManager.clearSubTasks();
@@ -290,8 +282,8 @@ abstract class TaskManagerTest<T extends TaskManager> {
     //20 Проверка удаления задачи по идентификатору (removeTaskById)
     @Test
     void Test20_DeletingATaskById() {
-        Task task1 = new Task("Задача 1", "описание задачи 1",
-                10, 2022, 03, 05, 14, 00);
+        Task task1 = new Task("Задача 1", "описание задачи 1", 30,
+                "2023-01-06T21:00:00");
         inMemoryTaskManager.createTasks(task1);
         inMemoryTaskManager.removeTaskById(0);
         assertFalse(inMemoryTaskManager.getAllTasks().containsKey(0));
@@ -300,8 +292,8 @@ abstract class TaskManagerTest<T extends TaskManager> {
     //20.1 Проверка удаления задачи по неверному идентификатору (removeEpicById)
     @Test
     void Test20_1_DeletingATaskByAnErroneousId() {
-        Task task1 = new Task("Задача 1", "описание задачи 1",
-                10, 2022, 03, 03, 15, 00);
+        Task task1 = new Task("Задача 1", "описание задачи 1", 30,
+                "2023-01-07T21:00:00");
         inMemoryTaskManager.createTasks(task1);
         inMemoryTaskManager.removeTaskById(3);
         assertTrue(inMemoryTaskManager.getAllTasks().containsKey(0));
@@ -327,11 +319,11 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     //22 Проверка удаления подзадачи по идентификатору (removeSubTaskById)
     @Test
-    void Test22_DeletingASubTaskById() throws IOException{
+    void Test22_DeletingASubTaskById() throws IOException {
         Epic epic1 = new Epic("Эпик 1", "описание эпика 1");
         inMemoryTaskManager.createEpics(epic1);
-        SubTask subTask1 = new SubTask("подзадача1", "описание подзадачи1", 40, 2022,
-                04, 12, 12, 00, epic1.getId());
+        SubTask subTask1 = new SubTask("подзадача1", "описание подзадачи1", 30,
+                "2023-01-08T21:00:00", epic1.getId());
         inMemoryTaskManager.createSubTasks(subTask1);
         inMemoryTaskManager.removeSubTaskById(1);
         assertFalse(inMemoryTaskManager.getAllSubTasks().containsKey(1));
@@ -339,11 +331,11 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     //22.1 Проверка удаления подзадачи по неверному идентификатору (метод removeSubTaskById)
     @Test
-    void Test22_1_DeletingASubTaskByAnErroneousId() throws IOException{
+    void Test22_1_DeletingASubTaskByAnErroneousId() throws IOException {
         Epic epic1 = new Epic("Эпик 1", "описание эпика 1");
         inMemoryTaskManager.createEpics(epic1);
-        SubTask subTask1 = new SubTask("подзадача1", "описание подзадачи1", 40, 2022,
-                04, 12, 12, 00, epic1.getId());
+        SubTask subTask1 = new SubTask("подзадача1", "описание подзадачи1", 30,
+                "2023-01-09T21:00:00", epic1.getId());
         inMemoryTaskManager.createSubTasks(subTask1);
         inMemoryTaskManager.removeSubTaskById(6);
         assertTrue(inMemoryTaskManager.getAllSubTasks().containsKey(1));
@@ -353,11 +345,11 @@ abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     void Test23_CheckingTheRecoveryOfAnEpicFromAFile() throws RuntimeException {
         TimeTaskException thrown = assertThrows(TimeTaskException.class, () -> {
-            Task task1 = new Task("Задача 1", "описание задачи 1",
-                    60, 2022, 05, 05, 12, 00);
+            Task task1 = new Task("Задача 1", "описание задачи 1", 30,
+                    "2022-12-11T21:00:00");
             inMemoryTaskManager.createTasks(task1);
-            Task task2 = new Task("Задача 2", "описание задачи 2",
-                    10, 2022, 05, 05, 12, 30);
+            Task task2 = new Task("Задача 2", "описание задачи 2", 30,
+                    "2022-12-12T21:00:00");
             inMemoryTaskManager.createTasks(task2);
         }, "ожидалась ошибка TimeTaskException");
         assertNotNull(thrown.getMessage());

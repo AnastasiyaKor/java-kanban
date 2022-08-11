@@ -1,43 +1,40 @@
 package service;
 
-import model.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import model.Epic;
+import model.SubTask;
+import model.Task;
+import server.HTTPTaskManager;
+import server.KVServer;
+import server.KVTaskClient;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 
 public class Main {
-
-    public static void main(String[] args) throws IOException {
-        TaskManager manager = Managers.getDefault();
-        Task task = new Task("task1", "description1", 30, 2022,
-                05, 14, 20, 00);
-        Task task2 = new Task("task2", "description2", 30, 2022,
-                05, 14, 20, 30);
-        Task task3 = new Task("task3", "description3", 30, 2022,
-                05, 10, 21, 30);
-        manager.createTasks(task);
-        manager.createTasks(task2);
-        manager.createTasks(task3);
-        //создаем эпик с 3 подзадачами
-        Epic epic1 = new Epic("epic1", "описание эпик 1");
-        manager.createEpics(epic1);
-        SubTask subTask1 = new SubTask("подзадача1", "описание подзадачи1", 40, 2022,
-                04, 13, 12, 00, epic1.getId());
-        manager.createSubTasks(subTask1);
-        SubTask subTask2 = new SubTask("подзадача2", "описание подзадачи", 30, 2022,
-                07, 12, 15, 00, epic1.getId());
-        manager.createSubTasks(subTask2);
-        SubTask subTask3 = new SubTask("подзадача3", "описание подзадачи3", 30, 2022,
-                07, 12, 11, 00, epic1.getId());
-        manager.createSubTasks(subTask3);
-        manager.getTaskById(2);
-        manager.getTaskById(1);
-        manager.getTaskById(0);
-        manager.getEpicById(3);
-        manager.getSubTaskById(6);
-        manager.getSubTaskById(5);
-        manager.getSubTaskById(4);
-        System.out.println(manager.getHistory());
-        //manager.removeEpicById(3);
-        manager.removeSubTaskById(6);
+    public static void main(String[] args) throws IOException, URISyntaxException, InterruptedException {
+        new KVServer().start();
+        KVTaskClient kvTaskClient = new KVTaskClient(new URL("http://localhost:8078/"));
+        HTTPTaskManager fb = new HTTPTaskManager(new URL("http://localhost:8078/"));
+        Task task = new Task("task", "deskr", 30, "2022-10-15T21:00:00");
+        fb.createTasks(task);
+        fb.getTaskById(0);
+        Task task1 = new Task("task1", "deskr1", 30, "2022-10-15T22:00:00");
+        fb.createTasks(task1);
+        Task task2 = new Task("task1", "deskr1", 30, "2022-10-16T22:00:00");
+        fb.createTasks(task2);
+        Epic epic = new Epic("epic", "deskrEpic");
+        fb.createEpics(epic);
+        SubTask subTask = new SubTask("subtask", "deskr", 30,
+                "2022-08-15T10:00:00", 3);
+        fb.createSubTasks(subTask);
+        fb.getTaskById(1);
+        fb.getTaskById(1);
+        System.out.println("___ИСТОРИЯ___");
+        System.out.println(fb.getHistory());
+        kvTaskClient.load("task");
+        fb.getAllTasks();
     }
 }

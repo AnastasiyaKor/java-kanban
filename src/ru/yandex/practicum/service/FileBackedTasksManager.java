@@ -11,16 +11,22 @@ import java.util.List;
 import static service.TaskType.*;
 
 public class FileBackedTasksManager extends InMemoryTaskManager {
-
     private final File file;
+
     private static final String FILE_HEADER = "id,type,name,status,description,startTime,duration,epic";
+
+
+    public FileBackedTasksManager() {
+        file = null;
+    }
 
     public FileBackedTasksManager(File file) {
         this.file = file;
     }
 
+
     // сохранение в файл
-    private void save() {
+    protected void save() {
         try (FileWriter fileWriter = new FileWriter(file)) {
             fileWriter.write(FILE_HEADER);
             fileWriter.write("\n");
@@ -44,19 +50,19 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         }
     }
 
-    private String toStringTask(Task task) {
+    protected String toStringTask(Task task) {
         return task.getId() + "," + TASK + "," + task.getName() + "," + task.getStatus() + ","
                 + task.getDescription() + "," + task.getStartTime() + ","
                 + task.getDuration();
     }
 
-    private String toStringEpic(Epic epic) {
+    protected String toStringEpic(Epic epic) {
         return epic.getId() + "," + EPIC + "," + epic.getName() + "," + epic.getStatus() + ","
                 + epic.getDescription() + "," + epic.getStartTime() + ","
                 + epic.getDuration();
     }
 
-    private String toStringSubtask(SubTask subTask) {
+    protected String toStringSubtask(SubTask subTask) {
         return subTask.getId() + "," + SUB_TASK + "," + subTask.getName() + ","
                 + subTask.getStatus() + "," + subTask.getDescription() + "," +
                 subTask.getStartTime() + "," + subTask.getDuration() + ","
@@ -64,7 +70,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     //сохранение истории в файл
-    private String toStringHistory(HistoryManager manager) {
+    protected String toStringHistory(HistoryManager manager) {
         StringBuilder sb = new StringBuilder();
         for (Task task : manager.getHistory()) {
             sb.append(task.getId());
@@ -76,7 +82,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     //метод создания истории из строки
-    private List<Integer> fromStringHistory(String value) {
+    protected List<Integer> fromStringHistory(String value) {
         List<Integer> historyId = new ArrayList<>();
         if (value != null) {
             String[] split = value.split(",");
@@ -88,7 +94,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     //метод создания задачи из строки
-    private void fromString(File file) {
+    protected void fromString(File file) {
         Task task;
         if (file != null) {
             try (FileReader reader = new FileReader(file); BufferedReader br = new BufferedReader(reader)) {
@@ -235,43 +241,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         save();
     }
 
-
-    public static void main(String[] args) {
-        FileBackedTasksManager fb = Managers.getDefaultFileBacked();
-        Task task = new Task("task1", "description1", 30, 2022, 05,
-                14, 22, 22);
-        fb.createTasks(task);
-        System.out.println("вызываем задачу:");
-        System.out.println(fb.getAllTasks());
-        //создаем эпик с 3 подзадачами
-        Epic epic1 = new Epic("epic1", "описание эпик 1");
-        fb.createEpics(epic1);
-        SubTask subTask1 = new SubTask("подзадача1", "описание подзадачи1", 40,
-                2022, 07, 12, 12, 00, epic1.getId());
-        fb.createSubTasks(subTask1);
-        SubTask subTask2 = new SubTask("подзадача2", "описание подзадачи", 30,
-                2022, 07, 12, 11, 00, epic1.getId());
-        fb.createSubTasks(subTask2);
-        SubTask subTask3 = new SubTask("подзадача3", "описание подзадачи3", 30,
-                2022, 07, 12, 14, 00, epic1.getId());
-        fb.createSubTasks(subTask3);
-        System.out.println("вызываем эпик:");
-        System.out.println(fb.getAllEpics());
-        System.out.println("вызываем подзадачи:");
-        System.out.println(fb.getAllSubTasks());
-        //вызываем задачи
-        System.out.println(fb.getEpicById(1));
-        System.out.println(fb.getTaskById(0));
-        System.out.println(fb.getEpicById(1));
-        System.out.println(fb.getTaskById(0));
-        System.out.println(fb.getSubTaskById(3));
-        System.out.println(fb.getSubTaskById(2));
-        System.out.println(fb.getSubTaskById(4));
-        System.out.println("Смотрим историю:");
-        System.out.println(fb.getHistory());//смотрим историю
-        System.out.println("Восстановление из файла:");
-        System.out.println(fb.getPrioritizedTasks());
-    }
 }
 
 

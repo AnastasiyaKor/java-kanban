@@ -1,15 +1,19 @@
 package service;
 
-import java.io.File;
+import server.HTTPTaskManager;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 
 public class Managers {
 
-    public static TaskManager getDefault() {
-        return new InMemoryTaskManager();
+    public static TaskManager getDefault() throws IOException, URISyntaxException {
+        return new HTTPTaskManager(new URL("http://localhost:8078/load/tasks"));
     }
 
-    public static FileBackedTasksManager getDefaultFileBacked() {
-        return new FileBackedTasksManager(new File("csvSave.csv"));
+    public static FileBackedTasksManager getDefaultFileBacked() throws IOException, URISyntaxException {
+        return new HTTPTaskManager(new URL("http://localhost:8078/load/tasks"));
     }
 
     public static HistoryManager getDefaultHistory() {

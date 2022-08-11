@@ -4,7 +4,7 @@ import model.*;
 
 import java.util.*;
 
-class InMemoryHistoryManager implements HistoryManager {
+public class InMemoryHistoryManager implements HistoryManager {
     private final Map<Integer, Node> customLinkedList = new HashMap<>();
     private Node<Task> head;
     private Node<Task> tail;

@@ -11,8 +11,34 @@ public class Task implements Comparable<Task> {
     private String description;
     private Status status;
     private int id;
-    private LocalDateTime startTime;
     private long duration;
+    private LocalDateTime startTime;
+
+    public Task() {
+    }
+
+    public Task(String name, String description, long duration, String startTime) {
+        this.name = name;
+        this.description = description;
+        this.status = Status.NEW;
+        this.duration = duration;
+        this.startTime = LocalDateTime.parse(startTime);
+    }
+
+    public Task(String name, String description, String status, int id) {
+        this.name = name;
+        this.description = description;
+        this.status = Status.valueOf(status);
+        this.id = id;
+    }
+
+    public Task(String name, String description, String status, long duration, String startTime) {
+        this.name = name;
+        this.description = description;
+        this.status = Status.valueOf(status);
+        this.duration = duration;
+        this.startTime = LocalDateTime.parse(startTime);
+    }
 
     public Task(String name, String description, long duration, int year,
                 int month, int day, int hours, int minutes) {
@@ -20,7 +46,7 @@ public class Task implements Comparable<Task> {
         this.description = description;
         this.duration = duration;
         this.status = Status.NEW;
-        this.startTime = LocalDateTime.of(year,month, day, hours, minutes);
+        this.startTime = LocalDateTime.of(year, month, day, hours, minutes);
     }
 
     public Task(String name, String description, String status) {
@@ -31,11 +57,10 @@ public class Task implements Comparable<Task> {
         this.duration = 0;
     }
 
-    public Task(String name, String description, String status, int id) {
+    public Task(String name, String description, Status status, int id) {
         this.name = name;
         this.description = description;
-        this.status = Status.valueOf(status);
-        this.id = id;
+        this.status = Status.status;
     }
 
     public Task(String name, String description, String status,
@@ -54,7 +79,7 @@ public class Task implements Comparable<Task> {
     }
 
 
-    public LocalDateTime getEndTime(){
+    public LocalDateTime getEndTime() {
         Duration durationTask = Duration.ofMinutes(duration);
         LocalDateTime endTime = startTime.plus(durationTask);
         return endTime;
@@ -134,4 +159,6 @@ public class Task implements Comparable<Task> {
                 '}';
     }
 
+    public void getDuration(long nextLong) {
+    }
 }

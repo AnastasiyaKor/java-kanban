@@ -7,15 +7,18 @@ import java.util.Objects;
 public class SubTask extends Task {
     private int epicId;
 
-    public SubTask(String name, String description, String status, int id, String startTime,
-                   long duration, int epicId) {
-        super(name, description, status, id, startTime, duration);
+    public SubTask(String name, String description, String startTime, long duration) {
+        super(name, description, duration, startTime);
+    }
+
+    public SubTask(String name, String description, long duration, String startTime, int epicId) {
+        super(name, description, duration, startTime);
         this.epicId = epicId;
     }
 
-    public SubTask(String name, String description, long duration, int year, int month,
-                   int day, int hours, int minutes, int epicId) {
-        super(name, description, duration, year, month, day, hours, minutes);
+    public SubTask(String name, String description, String status, int id, String startTime,
+                   long duration, int epicId) {
+        super(name, description, status, id, startTime, duration);
         this.epicId = epicId;
     }
 

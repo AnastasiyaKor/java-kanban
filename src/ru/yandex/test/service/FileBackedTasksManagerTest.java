@@ -7,7 +7,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
-import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static service.FileBackedTasksManager.loadFromFile;
@@ -15,6 +14,7 @@ import static service.FileBackedTasksManager.loadFromFile;
 class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager> {
     FileBackedTasksManager fileBackedTasksManager;
     File file = new File("csvSave.csv");
+
 
     @Override
     @BeforeEach
@@ -33,8 +33,8 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
     void Test2_1_CheckingTheRecoveryOfAnEpicFromAFile() {
         Epic epic1 = new Epic("епик1", "описание эпика 1");
         fileBackedTasksManager.createEpics(epic1);
-        SubTask subTask1 = new SubTask("подзадача1", "описание подзадачи1", 40, 2022,
-                04, 12, 12, 00, epic1.getId());
+        SubTask subTask1 = new SubTask("подзадача1", "описание подзадачи1",
+                30, "2023-10-15T21:00:00", epic1.getId());
         fileBackedTasksManager.createSubTasks(subTask1);
         assertEquals(1, fileBackedTasksManager.epics.size(), "данные эпика не восстановлены");
     }
@@ -44,10 +44,10 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
     void Test3_1__IdentityOfEpicDataFromFileAndMemory() {
         Epic epic1 = new Epic("епик1", "описание эпика 1");
         Epic epic2 = new Epic("епик2", "описание эпика 2");
-        SubTask subTask1 = new SubTask("подзадача1 эпика 1", "описание подзадачи1", 40,
-                2022, 04, 12, 12, 00, epic1.getId());
-        SubTask subTask2 = new SubTask("подзадача1 эпика2", "описание подзадачи1", 60,
-                2022, 04, 28, 12, 00, epic2.getId());
+        SubTask subTask1 = new SubTask("подзадача1 эпика 1", "описание подзадачи1",
+                30, "2022-08-09T21:00:00", epic1.getId());
+        SubTask subTask2 = new SubTask("подзадача1 эпика2", "описание подзадачи1",
+                30, "2022-08-09T21:00:00", epic2.getId());
         fileBackedTasksManager.createSubTasks(subTask1);
         fileBackedTasksManager.createEpics(epic1);
         fileBackedTasksManager.createSubTasks(subTask2);
@@ -59,10 +59,10 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
     //4.1.проверка идентичности данных задач из с файла и памяти
     @Test
     void Test4_1_IdentityOfTaskDataFromFileAndMemory() {
-        Task task = new Task("задача1", "описание задачи 1",
-                40, 2022, 12, 12, 20, 00);
-        Task task2 = new Task("задача2", "описание задачи 2",
-                80, 2022, 12, 18, 20, 00);
+        Task task = new Task("задача1", "описание задачи 1", 30,
+                "2022-08-10T21:00:00");
+        Task task2 = new Task("задача2", "описание задачи 2", 30,
+                "2022-08-11T21:00:00");
         fileBackedTasksManager.createTasks(task);
         fileBackedTasksManager.createTasks(task2);
         assertEquals(fileBackedTasksManager.getAllTasks(), loadFromFile(file).getAllTasks(),
@@ -74,12 +74,12 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
     void Test5_1_IdentityOfSubTaskDataFromFileAndMemory() {
         Epic epic1 = new Epic("епик1", "описание эпика 1");
         fileBackedTasksManager.createEpics(epic1);
-        SubTask subTask1 = new SubTask("подзадача1", "описание подзадачи1", 40, 2022,
-                04, 12, 12, 00, epic1.getId());
-        SubTask subTask2 = new SubTask("подзадача2", "описание подзадачи2", 70, 2022,
-                04, 19, 12, 00, epic1.getId());
-        SubTask subTask3 = new SubTask("подзадача3", "описание подзадачи3", 100, 2022,
-                04, 22, 12, 00, epic1.getId());
+        SubTask subTask1 = new SubTask("подзадача1", "описание подзадачи1",
+                30, "2022-08-13T21:00:00", epic1.getId());
+        SubTask subTask2 = new SubTask("подзадача2", "описание подзадачи2",
+                30, "2022-08-14T21:00:00", epic1.getId());
+        SubTask subTask3 = new SubTask("подзадача3", "описание подзадачи3",
+                30, "2022-08-15T21:00:00", epic1.getId());
         fileBackedTasksManager.createSubTasks(subTask1);
         fileBackedTasksManager.createSubTasks(subTask2);
         fileBackedTasksManager.createSubTasks(subTask3);
@@ -96,11 +96,11 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
     //7.1.проверка восстановления истории из файла
     @Test
     void Test7_1_CheckingTheHistoryRecoveryFromAFilledFile() {
-        Task task = new Task("задача1", "описание задачи 1",
-                40, 2022, 12, 12, 20, 00);
+        Task task = new Task("задача1", "описание задачи 1", 30,
+                "2022-10-15T21:00:00");
         Epic epic1 = new Epic("епик1", "описание эпика 1");
-        SubTask subTask1 = new SubTask("подзадача1", "описание подзадачи1", 40, 2022,
-                04, 12, 12, 00, 1);
+        SubTask subTask1 = new SubTask("подзадача1", "описание подзадачи1",
+                30, "2022-08-16T21:00:00", 1);
         fileBackedTasksManager.createTasks(task);
         fileBackedTasksManager.createEpics(epic1);
         fileBackedTasksManager.createSubTasks(subTask1);

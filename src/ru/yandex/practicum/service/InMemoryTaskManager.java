@@ -215,28 +215,32 @@ public class InMemoryTaskManager implements TaskManager {
     // продолжительность эпика
     private void durationEpic(int epicId) {
         Epic epic = epics.get(epicId);
-        long duration1;
-        long sum = 0;
-        if (getSubtasksByEpicId(epicId) != null) {
-            for (Integer i : getSubtasksByEpicId(epicId)) {
-                duration1 = subTasks.get(i).getDuration();
-                sum = sum + duration1;
+        if (epic != null) {
+            long duration1;
+            long sum = 0;
+            if (getSubtasksByEpicId(epicId) != null) {
+                for (Integer i : getSubtasksByEpicId(epicId)) {
+                    duration1 = subTasks.get(i).getDuration();
+                    sum = sum + duration1;
+                }
+                epic.setDuration(sum);
             }
-            epic.setDuration(sum);
         }
     }
 
     //РЕФРЕШ даты начала эпика
     private void refreshStartTimeEpic(int epicId) {
         Epic epic = epics.get(epicId);
-        LocalDateTime startEpic = LocalDateTime.MAX;
-        if (getSubtasksByEpicId(epicId) != null) {
-            for (Integer i : getSubtasksByEpicId(epicId)) {
-                if (subTasks.get(i).getStartTime().isBefore(startEpic)) {
-                    startEpic = subTasks.get(i).getStartTime();
+        if (epic != null) {
+            LocalDateTime startEpic = LocalDateTime.MAX;
+            if (getSubtasksByEpicId(epicId) != null) {
+                for (Integer i : getSubtasksByEpicId(epicId)) {
+                    if (subTasks.get(i).getStartTime().isBefore(startEpic)) {
+                        startEpic = subTasks.get(i).getStartTime();
+                    }
                 }
+                epic.setStartTime(startEpic);
             }
-            epic.setStartTime(startEpic);
         }
     }
 
@@ -257,19 +261,21 @@ public class InMemoryTaskManager implements TaskManager {
     //дата окончания эпика
     private void endTimeEpic(int epicId) {
         Epic epic = epics.get(epicId);
-        LocalDateTime startEpic = epic.getStartTime();
-        long durationSubTask = 0;
-        if (getSubtasksByEpicId(epicId) != null) {
-            for (Integer i : getSubtasksByEpicId(epicId)) {
-                if (subTasks.get(i).getStartTime().isAfter(startEpic)) {
-                    startEpic = subTasks.get(i).getStartTime();
-                    durationSubTask = subTasks.get(i).getDuration();
+        if (epic != null) {
+            LocalDateTime startEpic = epic.getStartTime();
+            long durationSubTask = 0;
+            if (getSubtasksByEpicId(epicId) != null) {
+                for (Integer i : getSubtasksByEpicId(epicId)) {
+                    if (subTasks.get(i).getStartTime().isAfter(startEpic)) {
+                        startEpic = subTasks.get(i).getStartTime();
+                        durationSubTask = subTasks.get(i).getDuration();
+                    }
                 }
+                LocalDateTime maxSubTaskTime = startEpic;
+                long maxSubTask = durationSubTask;
+                Duration maxDurationSubTask = Duration.ofMinutes(maxSubTask);
+                epic.setEndTime(maxSubTaskTime.plus(maxDurationSubTask));
             }
-            LocalDateTime maxSubTaskTime = startEpic;
-            long maxSubTask = durationSubTask;
-            Duration maxDurationSubTask = Duration.ofMinutes(maxSubTask);
-            epic.setEndTime(maxSubTaskTime.plus(maxDurationSubTask));
         }
     }
 

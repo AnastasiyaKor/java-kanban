@@ -13,8 +13,8 @@ class InMemoryHistoryManagerTest {
     void Test1_UpdatingAnEmptyTaskHistory() {
         InMemoryHistoryManager inMemoryHistoryManager = new InMemoryHistoryManager();
         InMemoryTaskManager inMemoryTaskManager = new InMemoryTaskManager();
-        Task task1 = new Task("task1", "описание задачи",
-                20, 2022, 12, 12, 16, 00);
+        Task task1 = new Task("task1", "описание задачи", 30,
+                "2022-10-15T16:00:00");
         inMemoryTaskManager.createTasks(task1);
         inMemoryHistoryManager.add(task1);
         inMemoryHistoryManager.remove(0);
@@ -26,8 +26,8 @@ class InMemoryHistoryManagerTest {
     void Test2_UpdatingTheHistoryOfTasksWithDuplicates() {
         InMemoryHistoryManager inMemoryHistoryManager = new InMemoryHistoryManager();
         InMemoryTaskManager inMemoryTaskManager = new InMemoryTaskManager();
-        Task task1 = new Task("task1", "описание задачи",
-                50, 2022, 12, 12, 16, 00);
+        Task task1 = new Task("task1", "описание задачи", 30,
+                "2022-10-15T23:00:00");
         inMemoryTaskManager.createTasks(task1);
         inMemoryHistoryManager.add(task1);
         inMemoryHistoryManager.add(task1);
@@ -39,8 +39,8 @@ class InMemoryHistoryManagerTest {
     void Test3_UpdatingTheHistoryWithTwoTasks() {
         InMemoryHistoryManager inMemoryHistoryManager = new InMemoryHistoryManager();
         InMemoryTaskManager inMemoryTaskManager = new InMemoryTaskManager();
-        Task task1 = new Task("task1", "описание задачи",
-                20, 2022, 12, 12, 17, 00);
+        Task task1 = new Task("task1", "описание задачи", 30,
+                "2022-10-15T22:00:00");
         inMemoryTaskManager.createTasks(task1);
         Epic epic1 = new Epic("epic", "описание эпика");
         inMemoryTaskManager.createEpics(epic1);
