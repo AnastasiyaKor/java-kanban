@@ -1,6 +1,7 @@
 package server;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpServer;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -10,9 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpServer;
-
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class KVServer {
     public static final int PORT = 8078;
@@ -32,13 +31,37 @@ public class KVServer {
     private void load(HttpExchange h) throws IOException {
         try {
             if (h.getRequestURI().getPath().endsWith("/load/tasks")) {
-                String jsonTask = data.get("task");
+                String jsonTask = null;
+                jsonTask = data.get("tasks");
                 System.out.println("запрос успешно обработан");
                 h.sendResponseHeaders(200, 0);//вызывать до вызова getResponseBody().
                 OutputStream os = h.getResponseBody();
                 os.write(jsonTask.getBytes(DEFAULT_CHARSET));
                 os.close();
-
+            } else if (h.getRequestURI().getPath().endsWith("/load/epics")) {
+                String jsonTask = null;
+                jsonTask = data.get("epics");
+                System.out.println("запрос успешно обработан");
+                h.sendResponseHeaders(200, 0);//вызывать до вызова getResponseBody().
+                OutputStream os = h.getResponseBody();
+                os.write(jsonTask.getBytes(DEFAULT_CHARSET));
+                os.close();
+            } else if (h.getRequestURI().getPath().endsWith("/load/subtasks")) {
+                String jsonTask = null;
+                jsonTask = data.get("subtasks");
+                System.out.println("запрос успешно обработан");
+                h.sendResponseHeaders(200, 0);//вызывать до вызова getResponseBody().
+                OutputStream os = h.getResponseBody();
+                os.write(jsonTask.getBytes(DEFAULT_CHARSET));
+                os.close();
+            } else if (h.getRequestURI().getPath().endsWith("/load/history")) {
+                String jsonTask = null;
+                jsonTask = data.get("history");
+                System.out.println("запрос успешно обработан");
+                h.sendResponseHeaders(200, 0);//вызывать до вызова getResponseBody().
+                OutputStream os = h.getResponseBody();
+                os.write(jsonTask.getBytes(DEFAULT_CHARSET));
+                os.close();
             }
         } finally {
             h.close();

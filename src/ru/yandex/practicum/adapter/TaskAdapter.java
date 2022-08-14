@@ -1,9 +1,10 @@
 package adapter;
 
-import com.google.gson.*;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 import model.Task;
-import service.Status;
-
 
 import java.lang.reflect.Type;
 import java.time.format.DateTimeFormatter;
@@ -16,18 +17,7 @@ public class TaskAdapter implements JsonSerializer<Task> {
         result.addProperty("type", "TASK");
         result.addProperty("name", task.getName());
         result.addProperty("description", task.getDescription());
-        Status status = task.getStatus();
-        if (status != null) {
-            if (status.equals(Status.NEW)) {
-                result.addProperty("status", "NEW");
-            } else if (status.equals(Status.IN_PROGRESS)) {
-                result.addProperty("status", "IN_PROGRESS");
-            } else if (status.equals(Status.DONE)) {
-                result.addProperty("status", "DONE");
-            } else {
-                result.addProperty("status", task.getStatus().toString());
-            }
-        }
+        result.addProperty("status", task.getStatus().name());
         result.addProperty("duration", task.getDuration());
         result.addProperty("startTime", task.getStartTime().format(DateTimeFormatter.
                 ofPattern("yyyy-MM-dd|HH:mm:ss")));

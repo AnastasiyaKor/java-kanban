@@ -1,16 +1,16 @@
 package server;
 
-import adapter.EpicAdapter;
 import adapter.LocalDateTimeAdapter;
 import adapter.SubTaskAdapter;
 import adapter.TaskAdapter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.sun.net.httpserver.HttpServer;
 import model.Epic;
 import model.SubTask;
 import model.Task;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.URI;
@@ -20,14 +20,24 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class HttpTaskServerTest {
     HttpTaskServer httpTaskServer;
+    KVServer kvServer;
 
     @BeforeEach
-    public void startServers() throws IOException, URISyntaxException, InterruptedException {
+    public void startServers() throws IOException, URISyntaxException {
+        kvServer = new KVServer();
+        kvServer.start();
         httpTaskServer = new HttpTaskServer();
+        httpTaskServer.startHttpTaskServer();
+    }
+
+    @AfterEach
+    public void stopServer() {
+        kvServer.stop();
+        httpTaskServer.stop();
     }
 
     @Test
@@ -151,7 +161,8 @@ class HttpTaskServerTest {
         gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter()); ;
         gsonBuilder.registerTypeAdapter(SubTask.class, new SubTaskAdapter());
         Gson gson = gsonBuilder.create();
-        SubTask subTask = new SubTask("подазача1", "описание подзадачи 1", 30, "2000-11-11T10:00", 0);
+        SubTask subTask = new SubTask("подазача1", "описание подзадачи 1", 30,
+                "2000-11-11T10:00", 0);
         String json = gson.toJson(subTask);
         URI uri = URI.create("http://localhost:8080/tasks/subtask");
         HttpRequest request = HttpRequest.newBuilder()

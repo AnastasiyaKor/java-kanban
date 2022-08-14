@@ -11,14 +11,27 @@ public class Epic extends Task {
     private ArrayList<Integer> subTasksId;
     private LocalDateTime endTime;
 
-    public Epic() {
-
-    }
 
     public Epic(String name, String description, Status status, int id, String startTime,
-                long duration, ArrayList<Integer> subTasksId) {
+                long duration) {
         super(name, description, String.valueOf(status), id, startTime, duration);
-        this.subTasksId = subTasksId;
+        this.subTasksId = new ArrayList<>();
+    }
+
+    public Epic(String name, String description, String status, int id, String startTime,
+                long duration, ArrayList<Integer> subTasksId) {
+        super(name, description, status, id, startTime, duration);
+        this.subTasksId = new ArrayList<>();
+    }
+
+    public Epic(String name, String description, long duration, String startTime) {
+        super(name, description, duration, startTime);
+        this.subTasksId = new ArrayList<>();
+    }
+
+    public Epic(String name, String description, Status status, int id, long duration, String startTime) {
+        super(name, description, String.valueOf(Status.NEW));
+        this.subTasksId = new ArrayList<>();
     }
 
 

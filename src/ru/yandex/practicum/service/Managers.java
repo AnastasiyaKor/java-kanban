@@ -4,16 +4,15 @@ import server.HTTPTaskManager;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
 
 public class Managers {
 
-    public static TaskManager getDefault() throws IOException, URISyntaxException {
-        return new HTTPTaskManager(new URL("http://localhost:8078/load/tasks"));
+    public static TaskManager getDefault() {
+        return new HTTPTaskManager("http://localhost:8078/", false);
     }
 
-    public static FileBackedTasksManager getDefaultFileBacked() throws IOException, URISyntaxException {
-        return new HTTPTaskManager(new URL("http://localhost:8078/load/tasks"));
+    public static FileBackedTasksManager getDefaultFileBacked() {
+        return new HTTPTaskManager("http://localhost:8078/load/tasks", false);
     }
 
     public static HistoryManager getDefaultHistory() {

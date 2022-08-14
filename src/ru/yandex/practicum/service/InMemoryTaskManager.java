@@ -84,13 +84,11 @@ public class InMemoryTaskManager implements TaskManager {
         priorityTasks.put(subTask.getStartTime(), subTask);
         if (epics.containsKey(subTask.getEpicId())) {
             subTasks.put(subTask.getId(), subTask);
+            getSubtasksByEpicId(subTask.getEpicId()).add(subTask.getId());
             startTimeEpic(subTask.getEpicId());
             durationEpic(subTask.getEpicId());
             endTimeEpic(subTask.getEpicId());
             refreshStatusEpic(subTask.getEpicId());
-            if (!(getSubtasksByEpicId(subTask.getEpicId()).contains(subTask.getId()))) {//добавила услоие
-                getSubtasksByEpicId(subTask.getEpicId()).add(subTask.getId());
-            }
         }
     }
 

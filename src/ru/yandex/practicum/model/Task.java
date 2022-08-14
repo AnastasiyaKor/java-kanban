@@ -10,7 +10,7 @@ public class Task implements Comparable<Task> {
     private String name;
     private String description;
     private Status status;
-    private int id;
+    private Integer id;
     private long duration;
     private LocalDateTime startTime;
 
@@ -125,7 +125,7 @@ public class Task implements Comparable<Task> {
         this.status = status;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 

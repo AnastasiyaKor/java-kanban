@@ -2,9 +2,9 @@ package adapter;
 
 import com.google.gson.*;
 import model.Epic;
-import service.Status;
 
 import java.lang.reflect.Type;
+import java.time.format.DateTimeFormatter;
 
 public class EpicAdapter implements JsonSerializer<Epic> {
     @Override
@@ -14,19 +14,11 @@ public class EpicAdapter implements JsonSerializer<Epic> {
         result.addProperty("type", "EPIC");
         result.addProperty("name", epic.getName());
         result.addProperty("description", epic.getDescription());
-        Status status = epic.getStatus();
-        if (status != null) {
-            if (status.equals(Status.NEW)) {
-                result.addProperty("status", "NEW");
-            } else if (status.equals(Status.IN_PROGRESS)) {
-                result.addProperty("status", "IN_PROGRESS");
-            } else if (status.equals(Status.DONE)) {
-                result.addProperty("status", "DONE");
-            } else {
-                result.addProperty("status", epic.getStatus().toString());
-            }
-        }
+        result.addProperty("status", epic.getStatus().name());
         result.addProperty("subTasksId", String.valueOf(epic.getSubTasksId()));
+        result.addProperty("duration", epic.getDuration());
+        result.addProperty("startTime", epic.getStartTime().
+                format(DateTimeFormatter.ofPattern("yyyy-MM-dd|HH:mm:ss")));
         return result;
     }
 

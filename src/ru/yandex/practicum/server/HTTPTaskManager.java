@@ -2,202 +2,116 @@ package server;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import model.Epic;
 import model.SubTask;
 import model.Task;
 import service.*;
 import adapter.*;
 
-import java.io.*;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.stream.Collectors;
 
-public class HTTPTaskManager extends FileBackedTasksManager implements TaskManager {
+public class HTTPTaskManager extends FileBackedTasksManager {
 
-    private URL url;
+    private String uri;
     private static KVTaskClient kvTaskClient;
+    boolean b;
+    GsonBuilder gsonBuilder = new GsonBuilder();
+    Gson gson1 = new Gson();
 
-    public HTTPTaskManager(URL url) throws IOException, URISyntaxException {
-        this.url = url;
-        kvTaskClient = new KVTaskClient(new URL("http://localhost:8078/load/tasks"));
+    public HTTPTaskManager(String uri, boolean b) {
+        kvTaskClient = new KVTaskClient(uri);
+        if (b) {
+            load();
+        }
+        this.uri = uri;
     }
 
     @Override
     public void save() {
-        GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter());
         gsonBuilder.registerTypeAdapter(Task.class, new TaskAdapter());
-        gsonBuilder.registerTypeAdapter(Epic.class, new EpicAdapter());
         gsonBuilder.registerTypeAdapter(SubTask.class, new SubTaskAdapter());
         Gson gson = gsonBuilder.create();
-        String count = "";
-        for (Task task : tasks.values()) {
-            String gsonTask = gson.toJson(toStringTask(task));
-            count = gsonTask + count;
-            kvTaskClient.put("tasks", count);
-        }
-        for (Epic task : epics.values()) {
-            String gsonEpic = gson.toJson(toStringEpic(task));
-            count = gsonEpic + count;
-            kvTaskClient.put("tasks", count);
-        }
-        for (SubTask task : subTasks.values()) {
-            String gsonSubTask = gson.toJson(toStringSubtask(task));
-            count = gsonSubTask + count;
-            kvTaskClient.put("tasks", count);
-        }
-        String gsonHistory = gson.toJson(toStringHistory(historyManager));
-        count = gsonHistory + count;
-        kvTaskClient.put("tasks", count);
+        String jsonTasks = gson.toJson(new ArrayList<>(tasks.values()));
+        kvTaskClient.put("tasks", jsonTasks);
+        String jsonEpics = gson1.toJson(new ArrayList<>(epics.values()));
+        kvTaskClient.put("epics", jsonEpics);
+        String jsonSubtask = gson.toJson(new ArrayList<>(subTasks.values()));
+        kvTaskClient.put("subtasks", jsonSubtask);
+        String jsonHistory = gson.toJson(getHistory().stream().map(Task::getId).collect(Collectors.toList()));
+        kvTaskClient.put("history", jsonHistory);
     }
 
-    public void fromServer(URL url) {
-        if (url.getPath().endsWith("/load/tasks")) {
-            String gsonTask = kvTaskClient.load("tasks");
-            if (gsonTask != null) {
-                if (gsonTask.length() > 2) {
-                    String result = gsonTask.substring(1, gsonTask.length() - 1);
-                    List<String> split1;
-                    split1 = List.of(result.split("\"\""));
-                    List<String> split1Revers = new ArrayList<>();
-                    for (String s : split1) {
-                        if (!(s.isBlank())) {
-                            split1Revers.add(0, s);
-                        }
-                    }
-                    String[] split;
-                    for (String str : split1Revers) {
-                        split = str.split(",");
-                        if ((split[1].equals("TASK"))) {
-                            Task task;
-                            task = new Task(split[2], split[4], split[3], Integer.parseInt(split[0]),
-                                    String.valueOf(split[5]), Long.parseLong(split[6]));
-                            tasks.put(Integer.valueOf(split[0]), task);
-                            priorityTasks.put(task.getStartTime(), task);
-                        } else if ((split[1].equals("EPIC"))) {
-                            Epic epic;
-                            epic = new Epic(split[2], split[4], split[3], Integer.parseInt(split[0]),
-                                    String.valueOf(split[5]), Long.parseLong(split[6]));
-                            epics.put(Integer.parseInt(split[0]), epic);
-                            priorityTasks.put(epic.getStartTime(), epic);
-                        } else if ((split[1].equals("SUB_TASK"))) {
-                            SubTask subTask;
-                            subTask = new SubTask(split[2], split[4], split[3], Integer.parseInt(split[0]),
-                                    String.valueOf(split[5]), Long.parseLong(split[6]), Integer.parseInt(split[7]));
-                            subTasks.put(Integer.valueOf(split[0]), subTask);
-                            priorityTasks.put(subTask.getStartTime(), subTask);
-                            refreshDateTimeEpic(subTask.getEpicId());
-                            getSubtasksByEpicId(subTask.getEpicId()).add(Integer.valueOf(split[0]));//добавила условие
-                        } else {
-                            for (String i : split) {
-                                if (tasks.containsKey(Integer.valueOf(i))) {
-                                    historyManager.add(tasks.get(Integer.valueOf(i)));
-                                } else if (epics.containsKey(Integer.valueOf(i))) {
-                                    historyManager.add(epics.get(Integer.valueOf(i)));
-                                } else if (subTasks.containsKey(Integer.valueOf(i))) {
-                                    historyManager.add(subTasks.get(Integer.valueOf(i)));
-                                }
-                            }
-                        }
-                    }
+    private void load() {
+        gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter());
+        gsonBuilder.registerTypeAdapter(Task.class, new TaskAdapter());
+        gsonBuilder.registerTypeAdapter(SubTask.class, new SubTaskAdapter());
+        Gson gson = gsonBuilder.create();
+        ArrayList<Task> tasksJson = gson.fromJson(kvTaskClient.load("tasks"),
+                new TypeToken<ArrayList<Task>>() {
+                }.getType());
+        ArrayList<Epic> epicJson = gson1.fromJson(kvTaskClient.load("epics"),
+                new TypeToken<ArrayList<Epic>>() {
+                }.getType());
+        ArrayList<SubTask> subtaskJson = gson.fromJson(kvTaskClient.load("subtasks"),
+                new TypeToken<ArrayList<SubTask>>() {
+                }.getType());
+        ArrayList<Integer> historyJson = gson.fromJson(kvTaskClient.load("history"),
+                new TypeToken<ArrayList<Integer>>() {
+                }.getType());
+        Task task;
+        if (tasksJson != null) {
+            for (Task t : tasksJson) {
+                int idTask = Integer.parseInt(String.valueOf(t.getId()));
+                if (idTask > id) {
+                    id = idTask;
+                }
+                task = new Task(t.getName(), t.getDescription(), String.valueOf(t.getStatus()), idTask,
+                        String.valueOf(t.getStartTime()), t.getDuration());
+                tasks.put(idTask, task);
+                priorityTasks.put(task.getStartTime(), task);
+            }
+        }
+        if (epicJson != null) {
+            for (Epic e : epicJson) {
+                int idTask = Integer.parseInt(String.valueOf(e.getId()));
+                if (idTask > id) {
+                    id = idTask;
+                }
+                task = new Epic(e.getName(), e.getDescription(), e.getStatus(), idTask,
+                        String.valueOf(e.getStartTime()), e.getDuration());
+                epics.put(idTask, (Epic) task);
+            }
+        }
+        if (subtaskJson != null) {
+            for (SubTask s : subtaskJson) {
+                int idTask = Integer.parseInt(String.valueOf(s.getId()));
+                if (idTask > id) {
+                    id = idTask;
+                }
+                task = new SubTask(s.getName(), s.getDescription(), String.valueOf(s.getStatus()), idTask,
+                        String.valueOf(s.getStartTime()), s.getDuration(),
+                        s.getEpicId());
+                subTasks.put(idTask, (SubTask) task);
+                epics.get(s.getEpicId()).getSubTasksId().add(idTask);
+                refreshDateTimeEpic(subTasks.get(id).getEpicId());
+                priorityTasks.put(task.getStartTime(), task);
+            }
+        }
+        if (historyJson != null) {
+            for (Integer i : historyJson) {
+                if (tasks.containsKey(i)) {
+                    historyManager.add(tasks.get(i));
+                } else if (epics.containsKey(i)) {
+                    historyManager.add(epics.get(i));
+                } else {
+                    refreshDateTimeEpic(subTasks.get(id).getEpicId());
+                    historyManager.add(subTasks.get(i));
                 }
             }
         }
-    }
-
-
-    public static HTTPTaskManager load(URL url) throws IOException, URISyntaxException {
-        HTTPTaskManager httpTaskManager = new HTTPTaskManager(url);
-        httpTaskManager.fromServer(url);
-        return httpTaskManager;
-    }
-
-    public HTTPTaskManager() {
-        super();
-        save();
-    }
-
-    @Override
-    public void createTasks(Task task) {
-        super.createTasks(task);
-        save();
-    }
-
-    @Override
-    public void createEpics(Epic epic) {
-        super.createEpics(epic);
-        save();
-    }
-
-    @Override
-    public void createSubTasks(SubTask subTask) {
-        super.createSubTasks(subTask);
-        save();
-    }
-
-    @Override
-    public Task getTaskById(int id) {
-        Task getTaskById = super.getTaskById(id);
-        save();
-        return getTaskById;
-    }
-
-    @Override
-    public Epic getEpicById(int id) {
-        Epic getEpicById = super.getEpicById(id);
-        save();
-        return getEpicById;
-    }
-
-    @Override
-    public SubTask getSubTaskById(int id) {
-        SubTask getSubTaskById = super.getSubTaskById(id);
-        save();
-        return getSubTaskById;
-    }
-
-    @Override
-    public void refreshTasks(Task task) {
-        super.refreshTasks(task);
-        save();
-    }
-
-    @Override
-    public void refreshEpics(Epic epic) {
-        super.refreshEpics(epic);
-        save();
-    }
-
-    @Override
-    public void refreshSubTasks(SubTask subTask) {
-        super.refreshSubTasks(subTask);
-        save();
-    }
-
-    @Override
-    public void refreshStatusEpic(int epicId) {
-        super.refreshStatusEpic(epicId);
-        save();
-    }
-
-    @Override
-    public void removeTaskById(int id) {
-        super.removeTaskById(id);
-        save();
-    }
-
-    @Override
-    public void removeEpicById(int id) {
-        super.removeEpicById(id);
-        save();
-    }
-
-    @Override
-    public void removeSubTaskById(int id) {
-        super.removeSubTaskById(id);
-        save();
     }
 }
