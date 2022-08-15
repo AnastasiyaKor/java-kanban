@@ -6,6 +6,7 @@ import model.Task;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +39,9 @@ public interface TaskManager {
     Epic getEpicById(int id);
 
     SubTask getSubTaskById(int id);
+
+    //получение подзадач эпика по его идентификатору
+    ArrayList<Integer> getSubtasksByEpicId(int epicId);
 
     //    обновление задач, эпиков, подзадач
     void refreshTasks(Task task);

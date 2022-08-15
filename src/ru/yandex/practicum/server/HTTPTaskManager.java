@@ -15,11 +15,13 @@ import java.util.stream.Collectors;
 
 public class HTTPTaskManager extends FileBackedTasksManager {
 
-    private String uri;
-    private static KVTaskClient kvTaskClient;
-    boolean b;
-    GsonBuilder gsonBuilder = new GsonBuilder();
-    Gson gson1 = new Gson();
+    private final String uri;
+    private final KVTaskClient kvTaskClient;
+    private final Gson gson1 = new Gson();
+    private final Gson gson = new GsonBuilder().registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
+            .registerTypeAdapter(Task.class, new TaskAdapter())
+            .registerTypeAdapter(SubTask.class, new SubTaskAdapter())
+            .create();
 
     public HTTPTaskManager(String uri, boolean b) {
         kvTaskClient = new KVTaskClient(uri);
@@ -31,10 +33,6 @@ public class HTTPTaskManager extends FileBackedTasksManager {
 
     @Override
     public void save() {
-        gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter());
-        gsonBuilder.registerTypeAdapter(Task.class, new TaskAdapter());
-        gsonBuilder.registerTypeAdapter(SubTask.class, new SubTaskAdapter());
-        Gson gson = gsonBuilder.create();
         String jsonTasks = gson.toJson(new ArrayList<>(tasks.values()));
         kvTaskClient.put("tasks", jsonTasks);
         String jsonEpics = gson1.toJson(new ArrayList<>(epics.values()));
@@ -46,10 +44,6 @@ public class HTTPTaskManager extends FileBackedTasksManager {
     }
 
     private void load() {
-        gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter());
-        gsonBuilder.registerTypeAdapter(Task.class, new TaskAdapter());
-        gsonBuilder.registerTypeAdapter(SubTask.class, new SubTaskAdapter());
-        Gson gson = gsonBuilder.create();
         ArrayList<Task> tasksJson = gson.fromJson(kvTaskClient.load("tasks"),
                 new TypeToken<ArrayList<Task>>() {
                 }.getType());
@@ -62,17 +56,14 @@ public class HTTPTaskManager extends FileBackedTasksManager {
         ArrayList<Integer> historyJson = gson.fromJson(kvTaskClient.load("history"),
                 new TypeToken<ArrayList<Integer>>() {
                 }.getType());
-        Task task;
         if (tasksJson != null) {
             for (Task t : tasksJson) {
                 int idTask = Integer.parseInt(String.valueOf(t.getId()));
                 if (idTask > id) {
                     id = idTask;
                 }
-                task = new Task(t.getName(), t.getDescription(), String.valueOf(t.getStatus()), idTask,
-                        String.valueOf(t.getStartTime()), t.getDuration());
-                tasks.put(idTask, task);
-                priorityTasks.put(task.getStartTime(), task);
+                tasks.put(idTask, t);
+                priorityTasks.put(t.getStartTime(), t);
             }
         }
         if (epicJson != null) {
@@ -81,9 +72,7 @@ public class HTTPTaskManager extends FileBackedTasksManager {
                 if (idTask > id) {
                     id = idTask;
                 }
-                task = new Epic(e.getName(), e.getDescription(), e.getStatus(), idTask,
-                        String.valueOf(e.getStartTime()), e.getDuration());
-                epics.put(idTask, (Epic) task);
+                epics.put(idTask, e);
             }
         }
         if (subtaskJson != null) {
@@ -92,13 +81,10 @@ public class HTTPTaskManager extends FileBackedTasksManager {
                 if (idTask > id) {
                     id = idTask;
                 }
-                task = new SubTask(s.getName(), s.getDescription(), String.valueOf(s.getStatus()), idTask,
-                        String.valueOf(s.getStartTime()), s.getDuration(),
-                        s.getEpicId());
-                subTasks.put(idTask, (SubTask) task);
+                subTasks.put(idTask, s);
                 epics.get(s.getEpicId()).getSubTasksId().add(idTask);
                 refreshDateTimeEpic(subTasks.get(id).getEpicId());
-                priorityTasks.put(task.getStartTime(), task);
+                priorityTasks.put(s.getStartTime(), s);
             }
         }
         if (historyJson != null) {

@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -27,7 +26,7 @@ class HttpTaskServerTest {
     KVServer kvServer;
 
     @BeforeEach
-    public void startServers() throws IOException, URISyntaxException {
+    public void startServers() throws IOException {
         kvServer = new KVServer();
         kvServer.start();
         httpTaskServer = new HttpTaskServer();
@@ -47,7 +46,7 @@ class HttpTaskServerTest {
                 .GET()
                 .uri(uri)
                 .version(HttpClient.Version.HTTP_1_1)
-                .header("Accept", "text/html")
+                .header("Accept", "*/*")
                 .build();
         HttpClient client = HttpClient.newHttpClient();
         HttpResponse.BodyHandler<String> handler = HttpResponse.BodyHandlers.ofString();
@@ -56,7 +55,8 @@ class HttpTaskServerTest {
             response = client.send(request, handler);
             assertEquals(200, response.statusCode());
         } catch (IOException | InterruptedException e) {
-            System.out.println("Во время выполнения запроса ресурса по url-адресу: '" + uri + "' возникла ошибка.\n" +
+            throw new TaskClientException("Во время выполнения запроса ресурса по url-адресу: '" + uri +
+                    "' возникла ошибка.\n" +
                     "Проверьте, пожалуйста, адрес и повторите попытку.");
         }
     }
@@ -68,7 +68,7 @@ class HttpTaskServerTest {
                 .GET()
                 .uri(uri)
                 .version(HttpClient.Version.HTTP_1_1)
-                .header("Accept", "text/html")
+                .header("Accept", "*/*")
                 .build();
         HttpClient client = HttpClient.newHttpClient();
         HttpResponse.BodyHandler<String> handler = HttpResponse.BodyHandlers.ofString();
@@ -77,7 +77,8 @@ class HttpTaskServerTest {
             response = client.send(request, handler);
             assertEquals(200, response.statusCode());
         } catch (IOException | InterruptedException e) {
-            System.out.println("Во время выполнения запроса ресурса по url-адресу: '" + uri + "' возникла ошибка.\n" +
+            throw new TaskClientException("Во время выполнения запроса ресурса по url-адресу: '" + uri +
+                    "' возникла ошибка.\n" +
                     "Проверьте, пожалуйста, адрес и повторите попытку.");
         }
     }
@@ -89,7 +90,7 @@ class HttpTaskServerTest {
                 .GET()
                 .uri(uri)
                 .version(HttpClient.Version.HTTP_1_1)
-                .header("Accept", "text/html")
+                .header("Accept", "*/*")
                 .build();
         HttpClient client = HttpClient.newHttpClient();
         HttpResponse.BodyHandler<String> handler = HttpResponse.BodyHandlers.ofString();
@@ -98,7 +99,8 @@ class HttpTaskServerTest {
             response = client.send(request, handler);
             assertEquals(200, response.statusCode());
         } catch (IOException | InterruptedException e) {
-            System.out.println("Во время выполнения запроса ресурса по url-адресу: '" + uri + "' возникла ошибка.\n" +
+            throw new TaskClientException("Во время выполнения запроса ресурса по url-адресу: '" + uri +
+                    "' возникла ошибка.\n" +
                     "Проверьте, пожалуйста, адрес и повторите попытку.");
         }
     }
@@ -116,7 +118,7 @@ class HttpTaskServerTest {
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .uri(uri)
                 .version(HttpClient.Version.HTTP_1_1)
-                .header("Accept", "text/html")
+                .header("Accept", "*/*")
                 .build();
         HttpClient client = HttpClient.newHttpClient();
         HttpResponse.BodyHandler<String> handler = HttpResponse.BodyHandlers.ofString();
@@ -125,7 +127,8 @@ class HttpTaskServerTest {
             response = client.send(request, handler);
             assertEquals(200, response.statusCode());
         } catch (IOException | InterruptedException e) {
-            System.out.println("Во время выполнения запроса ресурса по url-адресу: '" + uri + "' возникла ошибка.\n" +
+            throw new TaskClientException("Во время выполнения запроса ресурса по url-адресу: '" + uri +
+                    "' возникла ошибка.\n" +
                     "Проверьте, пожалуйста, адрес и повторите попытку.");
         }
     }
@@ -141,7 +144,7 @@ class HttpTaskServerTest {
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .uri(uri)
                 .version(HttpClient.Version.HTTP_1_1)
-                .header("Accept", "text/html")
+                .header("Accept", "*/*")
                 .build();
         HttpClient client = HttpClient.newHttpClient();
         HttpResponse.BodyHandler<String> handler = HttpResponse.BodyHandlers.ofString();
@@ -150,7 +153,8 @@ class HttpTaskServerTest {
             response = client.send(request, handler);
             assertEquals(200, response.statusCode());
         } catch (IOException | InterruptedException e) {
-            System.out.println("Во время выполнения запроса ресурса по url-адресу: '" + uri + "' возникла ошибка.\n" +
+            throw new TaskClientException("Во время выполнения запроса ресурса по url-адресу: '" + uri +
+                    "' возникла ошибка.\n" +
                     "Проверьте, пожалуйста, адрес и повторите попытку.");
         }
     }
@@ -169,7 +173,7 @@ class HttpTaskServerTest {
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .uri(uri)
                 .version(HttpClient.Version.HTTP_1_1)
-                .header("Accept", "text/html")
+                .header("Accept", "*/*")
                 .build();
         HttpClient client = HttpClient.newHttpClient();
         HttpResponse.BodyHandler<String> handler = HttpResponse.BodyHandlers.ofString();
@@ -178,7 +182,8 @@ class HttpTaskServerTest {
             response = client.send(request, handler);
             assertEquals(200, response.statusCode());
         } catch (IOException | InterruptedException e) {
-            System.out.println("Во время выполнения запроса ресурса по url-адресу: '" + uri + "' возникла ошибка.\n" +
+            throw new TaskClientException("Во время выполнения запроса ресурса по url-адресу: '" + uri +
+                    "' возникла ошибка.\n" +
                     "Проверьте, пожалуйста, адрес и повторите попытку.");
         }
     }
@@ -196,7 +201,7 @@ class HttpTaskServerTest {
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .uri(uri)
                 .version(HttpClient.Version.HTTP_1_1)
-                .header("Accept", "text/html")
+                .header("Accept", "*/*")
                 .build();
         HttpClient client = HttpClient.newHttpClient();
         HttpResponse.BodyHandler<String> handler = HttpResponse.BodyHandlers.ofString();
@@ -205,7 +210,8 @@ class HttpTaskServerTest {
             response = client.send(request, handler);
             assertEquals(200, response.statusCode());
         } catch (IOException | InterruptedException e) {
-            System.out.println("Во время выполнения запроса ресурса по url-адресу: '" + uri + "' возникла ошибка.\n" +
+            throw new TaskClientException("Во время выполнения запроса ресурса по url-адресу: '" + uri +
+                    "' возникла ошибка.\n" +
                     "Проверьте, пожалуйста, адрес и повторите попытку.");
         }
     }
@@ -221,7 +227,7 @@ class HttpTaskServerTest {
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .uri(uri)
                 .version(HttpClient.Version.HTTP_1_1)
-                .header("Accept", "text/html")
+                .header("Accept", "*/*")
                 .build();
         HttpClient client = HttpClient.newHttpClient();
         HttpResponse.BodyHandler<String> handler = HttpResponse.BodyHandlers.ofString();
@@ -230,7 +236,8 @@ class HttpTaskServerTest {
             response = client.send(request, handler);
             assertEquals(200, response.statusCode());
         } catch (IOException | InterruptedException e) {
-            System.out.println("Во время выполнения запроса ресурса по url-адресу: '" + uri + "' возникла ошибка.\n" +
+            throw new TaskClientException("Во время выполнения запроса ресурса по url-адресу: '" + uri +
+                    "' возникла ошибка.\n" +
                     "Проверьте, пожалуйста, адрес и повторите попытку.");
         }
     }
@@ -242,7 +249,7 @@ class HttpTaskServerTest {
                 .DELETE()
                 .uri(uri)
                 .version(HttpClient.Version.HTTP_1_1)
-                .header("Accept", "text/html")
+                .header("Accept", "*/*")
                 .build();
         HttpClient client = HttpClient.newHttpClient();
         HttpResponse.BodyHandler<String> handler = HttpResponse.BodyHandlers.ofString();
@@ -251,8 +258,8 @@ class HttpTaskServerTest {
             response = client.send(request, handler);
             assertEquals(200, response.statusCode());
         } catch (IOException | InterruptedException e) {
-            System.out.println("Во время выполнения запроса ресурса по url-адресу: '" + uri + "' возникла ошибка.\n" +
-                    "Проверьте, пожалуйста, адрес и повторите попытку.");
+            throw new TaskClientException("Во время выполнения запроса ресурса по url-адресу: '" + uri +
+                    "' возникла ошибка.\n" + "Проверьте, пожалуйста, адрес и повторите попытку.");
         }
     }
 
@@ -263,7 +270,7 @@ class HttpTaskServerTest {
                 .DELETE()
                 .uri(uri)
                 .version(HttpClient.Version.HTTP_1_1)
-                .header("Accept", "text/html")
+                .header("Accept", "*/*")
                 .build();
         HttpClient client = HttpClient.newHttpClient();
         HttpResponse.BodyHandler<String> handler = HttpResponse.BodyHandlers.ofString();
@@ -272,7 +279,8 @@ class HttpTaskServerTest {
             response = client.send(request, handler);
             assertEquals(200, response.statusCode());
         } catch (IOException | InterruptedException e) {
-            System.out.println("Во время выполнения запроса ресурса по url-адресу: '" + uri + "' возникла ошибка.\n" +
+            throw new TaskClientException("Во время выполнения запроса ресурса по url-адресу: '" + uri +
+                    "' возникла ошибка.\n" +
                     "Проверьте, пожалуйста, адрес и повторите попытку.");
         }
     }
@@ -284,7 +292,7 @@ class HttpTaskServerTest {
                 .DELETE()
                 .uri(uri)
                 .version(HttpClient.Version.HTTP_1_1)
-                .header("Accept", "text/html")
+                .header("Accept", "*/*")
                 .build();
         HttpClient client = HttpClient.newHttpClient();
         HttpResponse.BodyHandler<String> handler = HttpResponse.BodyHandlers.ofString();
@@ -293,8 +301,76 @@ class HttpTaskServerTest {
             response = client.send(request, handler);
             assertEquals(200, response.statusCode());
         } catch (IOException | InterruptedException e) {
-            System.out.println("Во время выполнения запроса ресурса по url-адресу: '" + uri + "' возникла ошибка.\n" +
+            throw new TaskClientException("Во время выполнения запроса ресурса по url-адресу: '" + uri +
+                    "' возникла ошибка.\n" +
                     "Проверьте, пожалуйста, адрес и повторите попытку.");
         }
     }
+
+    @Test
+    void test12_CheckingTheGETRequestHistory() {
+        URI uri = URI.create("http://localhost:8080/tasks/history");
+        HttpRequest request = HttpRequest.newBuilder()
+                .GET()
+                .uri(uri)
+                .version(HttpClient.Version.HTTP_1_1)
+                .header("Accept", "*/*")
+                .build();
+        HttpClient client = HttpClient.newHttpClient();
+        HttpResponse.BodyHandler<String> handler = HttpResponse.BodyHandlers.ofString();
+        HttpResponse<String> response;
+        try {
+            response = client.send(request, handler);
+            assertEquals(200, response.statusCode());
+        } catch (IOException | InterruptedException e) {
+            throw new TaskClientException("Во время выполнения запроса ресурса по url-адресу: '" + uri +
+                    "' возникла ошибка.\n" +
+                    "Проверьте, пожалуйста, адрес и повторите попытку.");
+        }
+    }
+
+    @Test
+    void test13_CheckingTheGETRequestPriority() {
+        URI uri = URI.create("http://localhost:8080/tasks/");
+        HttpRequest request = HttpRequest.newBuilder()
+                .GET()
+                .uri(uri)
+                .version(HttpClient.Version.HTTP_1_1)
+                .header("Accept", "*/*")
+                .build();
+        HttpClient client = HttpClient.newHttpClient();
+        HttpResponse.BodyHandler<String> handler = HttpResponse.BodyHandlers.ofString();
+        HttpResponse<String> response;
+        try {
+            response = client.send(request, handler);
+            assertEquals(200, response.statusCode());
+        } catch (IOException | InterruptedException e) {
+            throw new TaskClientException("Во время выполнения запроса ресурса по url-адресу: '" + uri +
+                    "' возникла ошибка.\n" +
+                    "Проверьте, пожалуйста, адрес и повторите попытку.");
+        }
+    }
+
+    @Test
+    void test15_CheckingTheGETRequestPriority() {
+        URI uri = URI.create("http://localhost:8080/tasks/subtask/epic/?id=");
+        HttpRequest request = HttpRequest.newBuilder()
+                .GET()
+                .uri(uri)
+                .version(HttpClient.Version.HTTP_1_1)
+                .header("Accept", "*/*")
+                .build();
+        HttpClient client = HttpClient.newHttpClient();
+        HttpResponse.BodyHandler<String> handler = HttpResponse.BodyHandlers.ofString();
+        HttpResponse<String> response;
+        try {
+            response = client.send(request, handler);
+            assertEquals(200, response.statusCode());
+        } catch (IOException | InterruptedException e) {
+            throw new TaskClientException("Во время выполнения запроса ресурса по url-адресу: '" + uri +
+                    "' возникла ошибка.\n" +
+                    "Проверьте, пожалуйста, адрес и повторите попытку.");
+        }
+    }
+
 }

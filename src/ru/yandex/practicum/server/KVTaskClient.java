@@ -26,173 +26,59 @@ public class KVTaskClient {
                 .build();
         try {
             final HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            if (!(response.statusCode() == 200)) {
+                throw new TaskClientException("Что-то пошло не так. Сервер вернул код состояния:" +
+                        response.statusCode());
+            }
             apiKey = response.body();
         } catch (IOException | InterruptedException e) {
-            System.out.println("Во время выполнения запроса возникла ошибка.\n" +
+            throw new TaskClientException("Во время выполнения запроса возникла ошибка.\n" +
                     "Проверьте, пожалуйста, адрес и повторите попытку.");
         }
         return apiKey;
     }
 
     public void put(String key, String json) {
-        if (key.equals("tasks")) {
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("http://localhost:8078/save/" + key + "?API_TOKEN=" + apiKey))
-                    .version(HttpClient.Version.HTTP_1_1)
-                    .header("Accept", "*/*")
-                    .POST(HttpRequest.BodyPublishers.ofString(json))
-                    .build();
-            HttpClient client = HttpClient.newHttpClient();
-            try {
-                final HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-                if (!(response.statusCode() == 200)) {
-                    throw new TaskClientException("Что-то пошло не так. Сервер вернул код состояния:" +
-                            response.statusCode());
-                }
-            } catch (IOException | InterruptedException e) {
-                System.out.println("Во время выполнения запроса возникла ошибка.\n" +
-                        "Проверьте, пожалуйста, адрес и повторите попытку.");
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8078/save/" + key + "?API_TOKEN=" + apiKey))
+                .version(HttpClient.Version.HTTP_1_1)
+                .header("Accept", "*/*")
+                .POST(HttpRequest.BodyPublishers.ofString(json))
+                .build();
+        HttpClient client = HttpClient.newHttpClient();
+        try {
+            final HttpResponse<Void> response = client.send(request, HttpResponse.BodyHandlers.discarding());
+            if (!(response.statusCode() == 200)) {
+                throw new TaskClientException("Что-то пошло не так. Сервер вернул код состояния:" +
+                        response.statusCode());
             }
-        } else if (key.equals("epics")) {
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("http://localhost:8078/save/" + key + "?API_TOKEN=" + apiKey))
-                    .version(HttpClient.Version.HTTP_1_1)
-                    .header("Accept", "*/*")
-                    .POST(HttpRequest.BodyPublishers.ofString(json))
-                    .build();
-            HttpClient client = HttpClient.newHttpClient();
-            try {
-                final HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-                if (!(response.statusCode() == 200)) {
-                    throw new TaskClientException("Что-то пошло не так. Сервер вернул код состояния:" +
-                            response.statusCode());
-                }
-            } catch (IOException | InterruptedException e) {
-                System.out.println("Во время выполнения запроса возникла ошибка.\n" +
-                        "Проверьте, пожалуйста, адрес и повторите попытку.");
-            }
-        } else if (key.equals("subtasks")) {
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("http://localhost:8078/save/" + key + "?API_TOKEN=" + apiKey))
-                    .version(HttpClient.Version.HTTP_1_1)
-                    .header("Accept", "*/*")
-                    .POST(HttpRequest.BodyPublishers.ofString(json))
-                    .build();
-            HttpClient client = HttpClient.newHttpClient();
-            try {
-                final HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-                if (!(response.statusCode() == 200)) {
-                    throw new TaskClientException("Что-то пошло не так. Сервер вернул код состояния:" +
-                            response.statusCode());
-                }
-            } catch (IOException | InterruptedException e) {
-                System.out.println("Во время выполнения запроса возникла ошибка.\n" +
-                        "Проверьте, пожалуйста, адрес и повторите попытку.");
-            }
-        } else if (key.equals("history")) {
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("http://localhost:8078/save/" + key + "?API_TOKEN=" + apiKey))
-                    .version(HttpClient.Version.HTTP_1_1)
-                    .header("Accept", "*/*")
-                    .POST(HttpRequest.BodyPublishers.ofString(json))
-                    .build();
-            HttpClient client = HttpClient.newHttpClient();
-            try {
-                final HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-                if (!(response.statusCode() == 200)) {
-                    throw new TaskClientException("Что-то пошло не так. Сервер вернул код состояния:" +
-                            response.statusCode());
-                }
-            } catch (IOException | InterruptedException e) {
-                System.out.println("Во время выполнения запроса возникла ошибка.\n" +
-                        "Проверьте, пожалуйста, адрес и повторите попытку.");
-            }
+        } catch (IOException | InterruptedException e) {
+            throw new TaskClientException("Во время выполнения запроса возникла ошибка.\\n\" +\n" +
+                    "Проверьте, пожалуйста, адрес и повторите попытку.");
         }
     }
 
     public String load(String key) {
         String task = null;
         HttpClient client = HttpClient.newHttpClient();
-        if (key.equals("tasks")) {
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("http://localhost:8078/load/" + key + "?API_TOKEN=" + apiKey))
-                    .GET()
-                    .version(HttpClient.Version.HTTP_1_1)
-                    .header("Accept", "*/*")
-                    .build();
-            try {
-                final HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-                if (response.statusCode() == 200) {
-                    if (response.body() != null) {
-                        task = response.body();
-                    }
-                } else {
-                    throw new TaskClientException("response.statusCode() != 200");
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8078/load/" + key + "?API_TOKEN=" + apiKey))
+                .GET()
+                .version(HttpClient.Version.HTTP_1_1)
+                .header("Accept", "*/*")
+                .build();
+        try {
+            final HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == 200) {
+                if (response.body() != null) {
+                    task = response.body();
                 }
-            } catch (IOException | InterruptedException e) {
-                System.out.println("Во время выполнения запроса возникла ошибка.\n" +
-                        "Проверьте, пожалуйста, адрес и повторите попытку.");
+            } else {
+                throw new TaskClientException("response.statusCode() != 200");
             }
-        } else if (key.equals("epics")) {
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("http://localhost:8078/load/" + key + "?API_TOKEN=" + apiKey))
-                    .GET()
-                    .version(HttpClient.Version.HTTP_1_1)
-                    .header("Accept", "*/*")
-                    .build();
-            try {
-                final HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-                if (response.statusCode() == 200) {
-                    if (response.body() != null) {
-                        task = response.body();
-                    }
-                } else {
-                    throw new TaskClientException("response.statusCode() != 200");
-                }
-            } catch (IOException | InterruptedException e) {
-                System.out.println("Во время выполнения запроса возникла ошибка.\n" +
-                        "Проверьте, пожалуйста, адрес и повторите попытку.");
-            }
-        } else if (key.equals("subtasks")) {
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("http://localhost:8078/load/" + key + "?API_TOKEN=" + apiKey))
-                    .GET()
-                    .version(HttpClient.Version.HTTP_1_1)
-                    .header("Accept", "*/*")
-                    .build();
-            try {
-                final HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-                if (response.statusCode() == 200) {
-                    if (response.body() != null) {
-                        task = response.body();
-                    }
-                } else {
-                    throw new TaskClientException("response.statusCode() != 200");
-                }
-            } catch (IOException | InterruptedException e) {
-                System.out.println("Во время выполнения запроса возникла ошибка.\n" +
-                        "Проверьте, пожалуйста, адрес и повторите попытку.");
-            }
-        } else if (key.equals("history")) {
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("http://localhost:8078/load/" + key + "?API_TOKEN=" + apiKey))
-                    .GET()
-                    .version(HttpClient.Version.HTTP_1_1)
-                    .header("Accept", "*/*")
-                    .build();
-            try {
-                final HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-                if (response.statusCode() == 200) {
-                    if (response.body() != null) {
-                        task = response.body();
-                    }
-                } else {
-                    throw new TaskClientException("response.statusCode() != 200");
-                }
-            } catch (IOException | InterruptedException e) {
-                System.out.println("Во время выполнения запроса возникла ошибка.\n" +
-                        "Проверьте, пожалуйста, адрес и повторите попытку.");
-            }
+        } catch (IOException | InterruptedException e) {
+            throw new TaskClientException("Во время выполнения запроса возникла ошибка.\n" +
+                    "Проверьте, пожалуйста, адрес и повторите попытку.");
         }
         return task;
     }

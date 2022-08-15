@@ -52,7 +52,7 @@ public class InMemoryTaskManager implements TaskManager {
             if (addStartTime.isAfter(endTimeExistTask) || addStartTime.isEqual(endTimeExistTask)) {
                 continue;
             }
-            if (task.getId() == existTask.getId()) {
+            if (Objects.equals(task.getId(), existTask.getId())) {
                 continue;
             }
             throw new TimeTaskException(task + " пересекается с началом времени задачи: " + existTask);
@@ -95,25 +95,16 @@ public class InMemoryTaskManager implements TaskManager {
     //    получение списка задач, эпиков, подзадач
     @Override
     public HashMap<Integer, Task> getAllTasks() {
-        for (Task t : tasks.values()) {
-            System.out.println(t);
-        }
         return new HashMap<>(tasks);
     }
 
     @Override
     public HashMap<Integer, Epic> getAllEpics() {
-        for (Epic e : epics.values()) {
-            System.out.println(e);
-        }
         return new HashMap<>(epics);
     }
 
     @Override
     public HashMap<Integer, SubTask> getAllSubTasks() {
-        for (SubTask t : subTasks.values()) {
-            System.out.println(t);
-        }
         return new HashMap<>(subTasks);
     }
 
@@ -142,6 +133,7 @@ public class InMemoryTaskManager implements TaskManager {
         return subTasks.get(id);
     }
 
+    @Override
     public ArrayList<Integer> getSubtasksByEpicId(int epicId) {
         if (epics.get(epicId) != null) {
             return epics.get(epicId).getSubTasksId();
