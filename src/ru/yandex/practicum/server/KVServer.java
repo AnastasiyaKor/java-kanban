@@ -31,34 +31,34 @@ public class KVServer {
     private void load(HttpExchange h) throws IOException {
         try {
             if (h.getRequestURI().getPath().endsWith("/load/tasks")) {
-                String jsonTask = null;
+                String jsonTask;
                 jsonTask = data.get("tasks");
                 System.out.println("запрос успешно обработан");
-                h.sendResponseHeaders(200, 0);//вызывать до вызова getResponseBody().
+                h.sendResponseHeaders(200, 0);
                 OutputStream os = h.getResponseBody();
                 os.write(jsonTask.getBytes(DEFAULT_CHARSET));
                 os.close();
             } else if (h.getRequestURI().getPath().endsWith("/load/epics")) {
-                String jsonTask = null;
+                String jsonTask;
                 jsonTask = data.get("epics");
                 System.out.println("запрос успешно обработан");
-                h.sendResponseHeaders(200, 0);//вызывать до вызова getResponseBody().
+                h.sendResponseHeaders(200, 0);
                 OutputStream os = h.getResponseBody();
                 os.write(jsonTask.getBytes(DEFAULT_CHARSET));
                 os.close();
             } else if (h.getRequestURI().getPath().endsWith("/load/subtasks")) {
-                String jsonTask = null;
+                String jsonTask;
                 jsonTask = data.get("subtasks");
                 System.out.println("запрос успешно обработан");
-                h.sendResponseHeaders(200, 0);//вызывать до вызова getResponseBody().
+                h.sendResponseHeaders(200, 0);
                 OutputStream os = h.getResponseBody();
                 os.write(jsonTask.getBytes(DEFAULT_CHARSET));
                 os.close();
             } else if (h.getRequestURI().getPath().endsWith("/load/history")) {
-                String jsonTask = null;
+                String jsonTask;
                 jsonTask = data.get("history");
                 System.out.println("запрос успешно обработан");
-                h.sendResponseHeaders(200, 0);//вызывать до вызова getResponseBody().
+                h.sendResponseHeaders(200, 0);
                 OutputStream os = h.getResponseBody();
                 os.write(jsonTask.getBytes(DEFAULT_CHARSET));
                 os.close();

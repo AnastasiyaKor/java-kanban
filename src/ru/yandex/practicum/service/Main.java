@@ -8,7 +8,6 @@ import server.KVServer;
 import server.KVTaskClient;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 
 public class Main {
     public static void main(String[] args) throws IOException {
@@ -29,7 +28,6 @@ public class Main {
         fb.createSubTasks(subTask);
         fb.getTaskById(1);
         fb.getTaskById(1);
-
         HTTPTaskManager taskManager = new HTTPTaskManager("http://localhost:8078/", true);
         System.out.println("задачи:");
         System.out.println(taskManager.getAllTasks());
@@ -41,6 +39,5 @@ public class Main {
         System.out.println(taskManager.getHistory());
         System.out.println("прриоритет:");
         System.out.println(taskManager.getPrioritizedTasks());
-
     }
 }

@@ -1,8 +1,11 @@
 package service;
 
-import model.*;
+import model.Task;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class InMemoryHistoryManager implements HistoryManager {
     private final Map<Integer, Node> customLinkedList = new HashMap<>();
@@ -10,7 +13,6 @@ public class InMemoryHistoryManager implements HistoryManager {
     private Node<Task> tail;
     private int size = 0;
 
-    //добавление задачи в конец списка
     public void linkLast(Task task) {
         if (size == 0) {
             head = new Node<>(null, task, null);
@@ -24,7 +26,6 @@ public class InMemoryHistoryManager implements HistoryManager {
         customLinkedList.put(task.getId(), tail);
     }
 
-    //обновление истории
     @Override
     public void add(Task task) {
         if (customLinkedList.containsKey(task.getId())) {
@@ -33,13 +34,11 @@ public class InMemoryHistoryManager implements HistoryManager {
         linkLast(task);
     }
 
-    // просмотр истории
     @Override
     public List<Task> getHistory() {
         return getTask();
     }
 
-    //сбор задач в список
     private List<Task> getTask() {
         List<Task> linkLastList = new ArrayList<>();
         Node<Task> node = head;
@@ -57,7 +56,6 @@ public class InMemoryHistoryManager implements HistoryManager {
         return false;
     }
 
-    //удаление ноды
     public boolean removeNode(Node node) {
         if (node != null) {
             Node nodeNext = node.next;

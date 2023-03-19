@@ -1,6 +1,8 @@
 package service;
 
-import model.*;
+import model.Epic;
+import model.SubTask;
+import model.Task;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -22,13 +24,11 @@ public class InMemoryTaskManager implements TaskManager {
         this.priorityTasks = new TreeMap<>();
     }
 
-    //вызов сортировки
     @Override
     public Map<LocalDateTime, Task> getPrioritizedTasks() {
         return priorityTasks;
     }
 
-    //получение истории
     @Override
     public List<Task> getHistory() {
         List<Task> history = historyManager.getHistory();
@@ -39,7 +39,6 @@ public class InMemoryTaskManager implements TaskManager {
         return history;
     }
 
-    //проверка пересечений
     private void checkingForIntersectionsOfTasks(Task task) {
         LocalDateTime addStartTime = task.getStartTime();
         LocalDateTime addEndTime = task.getEndTime();
@@ -59,7 +58,6 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-    //    создание задач, эпиков, подзадач
     @Override
     public void createTasks(Task task) {
         task.setId(id);
@@ -92,7 +90,6 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-    //    получение списка задач, эпиков, подзадач
     @Override
     public HashMap<Integer, Task> getAllTasks() {
         return new HashMap<>(tasks);
@@ -108,7 +105,6 @@ public class InMemoryTaskManager implements TaskManager {
         return new HashMap<>(subTasks);
     }
 
-    //    получение задач, эпиков, подзадач по идентификатору
     @Override
     public Task getTaskById(int id) {
         if (tasks.get(id) != null) {
@@ -142,7 +138,6 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-    //    обновление задач, эпиков, подзадач
     @Override
     public void refreshTasks(Task task) {
         Task delete = tasks.get(task.getId());
@@ -176,7 +171,6 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-    //    обновление статуса эпика
     public void refreshStatusEpic(int epicId) {
         Epic epic = epics.get(epicId);
         int newStatus = 0;
@@ -202,7 +196,6 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-    // продолжительность эпика
     private void durationEpic(int epicId) {
         Epic epic = epics.get(epicId);
         if (epic != null) {
@@ -218,7 +211,6 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-    //РЕФРЕШ даты начала эпика
     private void refreshStartTimeEpic(int epicId) {
         Epic epic = epics.get(epicId);
         if (epic != null) {
@@ -234,7 +226,6 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-    // дата начала эпика
     private void startTimeEpic(int epicId) {
         Epic epic = epics.get(epicId);
         LocalDateTime startEpic = epic.getStartTime();
@@ -248,7 +239,6 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-    //дата окончания эпика
     private void endTimeEpic(int epicId) {
         Epic epic = epics.get(epicId);
         if (epic != null) {
@@ -269,14 +259,12 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-    // рефреш даты и продолжительности эпика
     public void refreshDateTimeEpic(int epicId) {
         refreshStartTimeEpic(epicId);
         durationEpic(epicId);
         endTimeEpic(epicId);
     }
 
-    //    удаление задач, эпиков, подзадач
     @Override
     public void clearTasks() {
         for (Integer id : tasks.keySet()) {
@@ -313,7 +301,6 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-    //    удаление задач, эпиков, подзадач по  идентификатору
     @Override
     public void removeTaskById(int id) {
         if (tasks.get(id) != null) {

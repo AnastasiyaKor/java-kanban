@@ -1,6 +1,9 @@
 package adapter;
 
-import com.google.gson.*;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 import model.Epic;
 
 import java.lang.reflect.Type;
@@ -21,6 +24,4 @@ public class EpicAdapter implements JsonSerializer<Epic> {
                 format(DateTimeFormatter.ofPattern("yyyy-MM-dd|HH:mm:ss")));
         return result;
     }
-
-
 }

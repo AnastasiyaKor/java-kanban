@@ -2,9 +2,6 @@ package service;
 
 import server.HTTPTaskManager;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-
 public class Managers {
 
     public static TaskManager getDefault() {

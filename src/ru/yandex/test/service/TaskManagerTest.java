@@ -3,14 +3,14 @@ package service;
 import model.Epic;
 import model.SubTask;
 import model.Task;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static service.Status.*;
-import static service.Status.IN_PROGRESS;
 
 abstract class TaskManagerTest<T extends TaskManager> {
 

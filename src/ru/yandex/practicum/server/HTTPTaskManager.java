@@ -1,13 +1,15 @@
 package server;
 
+import adapter.LocalDateTimeAdapter;
+import adapter.SubTaskAdapter;
+import adapter.TaskAdapter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import model.Epic;
 import model.SubTask;
 import model.Task;
-import service.*;
-import adapter.*;
+import service.FileBackedTasksManager;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -82,8 +84,6 @@ public class HTTPTaskManager extends FileBackedTasksManager {
                     id = idTask;
                 }
                 subTasks.put(idTask, s);
-                epics.get(s.getEpicId()).getSubTasksId().add(idTask);
-                refreshDateTimeEpic(subTasks.get(id).getEpicId());
                 priorityTasks.put(s.getStartTime(), s);
             }
         }
@@ -94,7 +94,6 @@ public class HTTPTaskManager extends FileBackedTasksManager {
                 } else if (epics.containsKey(i)) {
                     historyManager.add(epics.get(i));
                 } else {
-                    refreshDateTimeEpic(subTasks.get(id).getEpicId());
                     historyManager.add(subTasks.get(i));
                 }
             }
